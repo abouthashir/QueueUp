@@ -22,7 +22,6 @@ app.MapGet("/api/tokens/demo", () =>
         Id = Guid.NewGuid(),
         Prefix = 'A',
         Number = 14,
-        Status = TokenStatus.Waiting,
         CustomerName = "Anu",
         CreatedAt = DateTimeOffset.UtcNow
     };
