@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/backend/">
+    <Project Path="backend/QueueUp.Api.Tests/QueueUp.Api.Tests.csproj" />
     <Project Path="backend/QueueUp.Api/QueueUp.Api.csproj" />
   </Folder>
 </Solution>
