@@ -14,7 +14,7 @@ app.MapGet("/", () => "QueueUp API is running");
 
 app.MapGet("/api/health", () => new { status = "ok", service = "QueueUp API" });
 
-// Lesson 2: returns a sample token so we can see its JSON shape
+// Sample token for checking the JSON shape; replaced by real endpoints in the queue logic
 app.MapGet("/api/tokens/demo", () =>
 {
     var token = new Token
