@@ -12,7 +12,7 @@ public class Token
 
     public string DisplayNumber => $"{Prefix}-{Number:D3}";
 
-        public void Call(string counterName)
+    public void Call(string counterName)
     {
         if (Status != TokenStatus.Waiting)
         {
@@ -21,5 +21,14 @@ public class Token
 
         Status = TokenStatus.Called;
         CounterName = counterName;
+    }
+    public void Serve()
+    {
+        if (Status != TokenStatus.Called)
+        {
+            throw new InvalidOperationException($"Token {DisplayNumber} cannot be served because it is {Status}.");
+        }
+
+        Status = TokenStatus.Served;
     }
 }

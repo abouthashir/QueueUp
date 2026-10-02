@@ -42,4 +42,26 @@ public class TokenTests
 
         Assert.Throws<InvalidOperationException>(() => token.Call("Counter 3"));
     }
+    
+    [Fact]
+    public void Serve_CalledToken_BecomesServed()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        token.Serve();
+
+        Assert.Equal(TokenStatus.Served, token.Status);
+    }
+
+    [Fact]
+    public void Serve_WaitingToken_Throws()
+    {
+        var token = CreateWaitingToken();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => token.Serve());
+
+        Assert.Equal("Token A-014 cannot be served because it is Waiting.", exception.Message);
+    }
+
 }
