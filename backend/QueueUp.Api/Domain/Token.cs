@@ -12,8 +12,13 @@ public class Token
 
     public string DisplayNumber => $"{Prefix}-{Number:D3}";
 
-    public void Call(string counterName)
+        public void Call(string counterName)
     {
+        if (Status != TokenStatus.Waiting)
+        {
+            throw new InvalidOperationException($"Token {DisplayNumber} cannot be called because it is {Status}.");
+        }
+
         Status = TokenStatus.Called;
         CounterName = counterName;
     }

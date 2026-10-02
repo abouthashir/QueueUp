@@ -33,4 +33,13 @@ public class TokenTests
         Assert.Equal(TokenStatus.Called, token.Status);
         Assert.Equal("Counter 2", token.CounterName);
     }
+
+        [Fact]
+    public void Call_TokenAlreadyCalled_Throws()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        Assert.Throws<InvalidOperationException>(() => token.Call("Counter 3"));
+    }
 }
