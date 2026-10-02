@@ -22,6 +22,7 @@ public class Token
         Status = TokenStatus.Called;
         CounterName = counterName;
     }
+
     public void Serve()
     {
         if (Status != TokenStatus.Called)
@@ -40,5 +41,16 @@ public class Token
         }
 
         Status = TokenStatus.Skipped;
+    }
+
+    public void Recall(string counterName)
+    {
+        if (Status != TokenStatus.Skipped)
+        {
+            throw new InvalidOperationException($"Token {DisplayNumber} cannot be recalled because it is {Status}.");
+        }
+
+        Status = TokenStatus.Called;
+        CounterName = counterName;
     }
 }

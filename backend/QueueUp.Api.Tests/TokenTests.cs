@@ -34,7 +34,7 @@ public class TokenTests
         Assert.Equal("Counter 2", token.CounterName);
     }
 
-        [Fact]
+    [Fact]
     public void Call_TokenAlreadyCalled_Throws()
     {
         var token = CreateWaitingToken();
@@ -42,7 +42,7 @@ public class TokenTests
 
         Assert.Throws<InvalidOperationException>(() => token.Call("Counter 3"));
     }
-    
+
     [Fact]
     public void Serve_CalledToken_BecomesServed()
     {
@@ -64,7 +64,7 @@ public class TokenTests
         Assert.Equal("Token A-014 cannot be served because it is Waiting.", exception.Message);
     }
 
-        [Fact]
+    [Fact]
     public void Skip_CalledToken_BecomesSkipped()
     {
         var token = CreateWaitingToken();
@@ -85,4 +85,41 @@ public class TokenTests
         Assert.Equal("Token A-014 cannot be skipped because it is Waiting.", exception.Message);
     }
 
+        [Fact]
+    public void Recall_SkippedToken_BecomesCalledAtNewCounter()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+        token.Skip();
+
+        token.Recall("Counter 1");
+
+        Assert.Equal(TokenStatus.Called, token.Status);
+        Assert.Equal("Counter 1", token.CounterName);
+    }
+
+    [Fact]
+    public void Recall_CalledToken_Throws()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        var exception = Assert.Throws<InvalidOperationException>(() => token.Recall("Counter 1"));
+
+        Assert.Equal("Token A-014 cannot be recalled because it is Called.", exception.Message);
+    }
+
+    [Fact]
+    public void Recall_CanHappenAnyNumberOfTimes()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        token.Skip();
+        token.Recall("Counter 2");
+        token.Skip();
+        token.Recall("Counter 2");
+
+        Assert.Equal(TokenStatus.Called, token.Status);
+    }
 }
