@@ -7,7 +7,14 @@ public class Token
     public int Number { get; init; }
     public TokenStatus Status { get; private set; }
     public string? CustomerName { get; init; }
+    public string? CounterName { get; private set; }
     public DateTimeOffset CreatedAt { get; init; }
 
     public string DisplayNumber => $"{Prefix}-{Number:D3}";
+
+    public void Call(string counterName)
+    {
+        Status = TokenStatus.Called;
+        CounterName = counterName;
+    }
 }
