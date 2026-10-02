@@ -14,53 +14,42 @@ public class Token
 
     public void Call(string counterName)
     {
-        if (Status != TokenStatus.Waiting)
-        {
-            throw new InvalidOperationException($"Token {DisplayNumber} cannot be called because it is {Status}.");
-        }
-
+        EnsureStatus(TokenStatus.Waiting, "called");
         Status = TokenStatus.Called;
         CounterName = counterName;
     }
 
     public void Serve()
     {
-        if (Status != TokenStatus.Called)
-        {
-            throw new InvalidOperationException($"Token {DisplayNumber} cannot be served because it is {Status}.");
-        }
-
+        EnsureStatus(TokenStatus.Called, "served");
         Status = TokenStatus.Served;
     }
 
     public void Skip()
     {
-        if (Status != TokenStatus.Called)
-        {
-            throw new InvalidOperationException($"Token {DisplayNumber} cannot be skipped because it is {Status}.");
-        }
-
+        EnsureStatus(TokenStatus.Called, "skipped");
         Status = TokenStatus.Skipped;
     }
 
     public void Recall(string counterName)
     {
-        if (Status != TokenStatus.Skipped)
-        {
-            throw new InvalidOperationException($"Token {DisplayNumber} cannot be recalled because it is {Status}.");
-        }
-
+        EnsureStatus(TokenStatus.Skipped, "recalled");
         Status = TokenStatus.Called;
         CounterName = counterName;
     }
 
     public void Cancel()
     {
-        if (Status != TokenStatus.Waiting)
-        {
-            throw new InvalidOperationException($"Token {DisplayNumber} cannot be cancelled because it is {Status}.");
-        }
-
+        EnsureStatus(TokenStatus.Waiting, "cancelled");
         Status = TokenStatus.Cancelled;
+    }
+
+    private void EnsureStatus(TokenStatus requiredStatus, string action)
+    {
+        if (Status != requiredStatus)
+        {
+            throw new InvalidOperationException(
+                $"Token {DisplayNumber} cannot be {action} because it is {Status}.");
+        }
     }
 }
