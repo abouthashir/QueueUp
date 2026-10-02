@@ -85,7 +85,7 @@ public class TokenTests
         Assert.Equal("Token A-014 cannot be skipped because it is Waiting.", exception.Message);
     }
 
-        [Fact]
+    [Fact]
     public void Recall_SkippedToken_BecomesCalledAtNewCounter()
     {
         var token = CreateWaitingToken();
@@ -121,5 +121,26 @@ public class TokenTests
         token.Recall("Counter 2");
 
         Assert.Equal(TokenStatus.Called, token.Status);
+    }
+
+    [Fact]
+    public void Cancel_WaitingToken_BecomesCancelled()
+    {
+        var token = CreateWaitingToken();
+
+        token.Cancel();
+
+        Assert.Equal(TokenStatus.Cancelled, token.Status);
+    }
+
+    [Fact]
+    public void Cancel_CalledToken_Throws()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        var exception = Assert.Throws<InvalidOperationException>(() => token.Cancel());
+
+        Assert.Equal("Token A-014 cannot be cancelled because it is Called.", exception.Message);
     }
 }

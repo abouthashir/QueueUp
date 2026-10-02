@@ -53,4 +53,14 @@ public class Token
         Status = TokenStatus.Called;
         CounterName = counterName;
     }
+
+    public void Cancel()
+    {
+        if (Status != TokenStatus.Waiting)
+        {
+            throw new InvalidOperationException($"Token {DisplayNumber} cannot be cancelled because it is {Status}.");
+        }
+
+        Status = TokenStatus.Cancelled;
+    }
 }
