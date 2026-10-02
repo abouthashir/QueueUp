@@ -31,4 +31,14 @@ public class Token
 
         Status = TokenStatus.Served;
     }
+
+    public void Skip()
+    {
+        if (Status != TokenStatus.Called)
+        {
+            throw new InvalidOperationException($"Token {DisplayNumber} cannot be skipped because it is {Status}.");
+        }
+
+        Status = TokenStatus.Skipped;
+    }
 }

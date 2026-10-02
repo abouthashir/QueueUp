@@ -64,4 +64,25 @@ public class TokenTests
         Assert.Equal("Token A-014 cannot be served because it is Waiting.", exception.Message);
     }
 
+        [Fact]
+    public void Skip_CalledToken_BecomesSkipped()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        token.Skip();
+
+        Assert.Equal(TokenStatus.Skipped, token.Status);
+    }
+
+    [Fact]
+    public void Skip_WaitingToken_Throws()
+    {
+        var token = CreateWaitingToken();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => token.Skip());
+
+        Assert.Equal("Token A-014 cannot be skipped because it is Waiting.", exception.Message);
+    }
+
 }
