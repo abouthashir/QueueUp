@@ -72,4 +72,44 @@ public class QueueTests
 
         Assert.Equal("Queue General OPD is not accepting new tokens because it is Paused.", exception.Message);
     }
+
+    [Fact]
+    public void CountPeopleAhead_ThirdCustomer_HasTwoAhead()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu");
+        queue.Join("Rahul");
+        var third = queue.Join("Meera");
+
+        int ahead = queue.CountPeopleAhead(third);
+
+        Assert.Equal(2, ahead);
+    }
+
+    [Fact]
+    public void CountPeopleAhead_FirstCustomer_HasNobodyAhead()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        queue.Join("Rahul");
+
+        int ahead = queue.CountPeopleAhead(first);
+
+        Assert.Equal(0, ahead);
+    }
+
+    [Fact]
+    public void CountPeopleAhead_IgnoresTokensThatAreNoLongerWaiting()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        var second = queue.Join("Rahul");
+        var third = queue.Join("Meera");
+        first.Call("Counter 1");
+        second.Cancel();
+
+        int ahead = queue.CountPeopleAhead(third);
+
+        Assert.Equal(0, ahead);
+    }
 }
