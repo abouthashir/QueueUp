@@ -112,4 +112,33 @@ public class QueueTests
 
         Assert.Equal(0, ahead);
     }
+
+    // CallNext: staff call the next waiting customer to their counter
+
+    [Fact]
+    public void CallNext_CallsOldestWaitingToken()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        queue.Join("Rahul");
+
+        var called = queue.CallNext("Counter 1");
+
+        Assert.Same(first, called);
+        Assert.Equal(TokenStatus.Called, first.Status);
+        Assert.Equal("Counter 1", first.CounterName);
+    }
+
+    [Fact]
+    public void CallNext_PassesOverTokensThatAreNotWaiting()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        var second = queue.Join("Rahul");
+        first.Cancel();
+
+        var called = queue.CallNext("Counter 1");
+
+        Assert.Same(second, called);
+    }
 }

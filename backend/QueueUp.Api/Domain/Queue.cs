@@ -44,4 +44,15 @@ public class Queue
     {
         return _tokens.Count(other => other.Status == TokenStatus.Waiting && other.Number < token.Number);
     }
+
+    public Token? CallNext(string counterName)
+    {
+        Token? next = _tokens
+            .Where(token => token.Status == TokenStatus.Waiting)
+            .OrderBy(token => token.Number)
+            .FirstOrDefault();
+
+        next.Call(counterName);
+        return next;
+    }
 }
