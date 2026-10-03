@@ -42,16 +42,6 @@ public class Queue
 
     public int CountPeopleAhead(Token token)
     {
-        int count = 0;
-
-        foreach (Token other in _tokens)
-        {
-            if (other.Status == TokenStatus.Waiting && other.Number < token.Number)
-            {
-                count++;
-            }
-        }
-
-        return count;
+        return _tokens.Count(other => other.Status == TokenStatus.Waiting && other.Number < token.Number);
     }
 }
