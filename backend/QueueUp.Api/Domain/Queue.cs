@@ -22,6 +22,11 @@ public class Queue
 
     public Token Join(string? customerName)
     {
+        if (Status != QueueStatus.Open)
+        {
+            throw new InvalidOperationException($"Queue {Name} is not accepting new tokens because it is {Status}.");
+        }
+
         var token = new Token
         {
             Id = Guid.NewGuid(),

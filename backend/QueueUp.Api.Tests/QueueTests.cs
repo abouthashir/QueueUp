@@ -51,4 +51,25 @@ public class QueueTests
         Assert.Equal(2, second.Number);
         Assert.Equal(3, third.Number);
     }
+
+    [Fact]
+    public void Join_ClosedQueue_Throws()
+    {
+        var queue = new Queue { Name = "General OPD", Prefix = 'A' };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu"));
+
+        Assert.Equal("Queue General OPD is not accepting new tokens because it is Closed.", exception.Message);
+    }
+
+    [Fact]
+    public void Join_PausedQueue_Throws()
+    {
+        var queue = CreateOpenQueue();
+        queue.Pause();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu"));
+
+        Assert.Equal("Queue General OPD is not accepting new tokens because it is Paused.", exception.Message);
+    }
 }
