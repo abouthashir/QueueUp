@@ -141,4 +141,14 @@ public class QueueTests
 
         Assert.Same(second, called);
     }
+
+    [Fact]
+    public void CallNext_NobodyWaiting_ReturnsNull()
+    {
+        var queue = CreateOpenQueue();
+
+        var called = queue.CallNext("Counter 1");
+
+        Assert.Null(called);
+    }
 }

@@ -52,6 +52,11 @@ public class Queue
             .OrderBy(token => token.Number)
             .FirstOrDefault();
 
+        if (next == null)
+        {
+            return null;
+        }
+
         next.Call(counterName);
         return next;
     }
