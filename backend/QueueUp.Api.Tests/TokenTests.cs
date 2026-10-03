@@ -40,7 +40,9 @@ public class TokenTests
         var token = CreateWaitingToken();
         token.Call("Counter 2");
 
-        Assert.Throws<InvalidOperationException>(() => token.Call("Counter 3"));
+        var exception = Assert.Throws<InvalidOperationException>(() => token.Call("Counter 3"));
+
+        Assert.Equal("Token A-014 cannot be called because it is Called.", exception.Message);
     }
 
     [Fact]
