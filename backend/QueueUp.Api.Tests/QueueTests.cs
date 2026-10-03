@@ -24,4 +24,31 @@ public class QueueTests
 
         Assert.Equal(QueueStatus.Closed, queue.Status);
     }
+
+    [Fact]
+    public void Join_FirstCustomer_GetsTokenA001()
+    {
+        var queue = CreateOpenQueue();
+
+        var token = queue.Join("Anu");
+
+        Assert.Equal(1, token.Number);
+        Assert.Equal("A-001", token.DisplayNumber);
+        Assert.Equal("Anu", token.CustomerName);
+        Assert.Equal(TokenStatus.Waiting, token.Status);
+    }
+
+    [Fact]
+    public void Join_ThreeCustomers_GetNumbersInOrder()
+    {
+        var queue = CreateOpenQueue();
+
+        var first = queue.Join("Anu");
+        var second = queue.Join(null);
+        var third = queue.Join("Rahul");
+
+        Assert.Equal(1, first.Number);
+        Assert.Equal(2, second.Number);
+        Assert.Equal(3, third.Number);
+    }
 }
