@@ -151,4 +151,45 @@ public class QueueTests
 
         Assert.Null(called);
     }
+
+    [Fact]
+    public void CallNext_CounterStillServing_Throws()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu");
+        queue.Join("Rahul");
+        queue.CallNext("Counter 1");
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.CallNext("Counter 1"));
+
+        Assert.Equal("Counter 1 is still serving A-001. Mark it served or skipped first.", exception.Message);
+    }
+
+    [Fact]
+    public void CallNext_AfterServing_CallsTheNextToken()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        var second = queue.Join("Rahul");
+        queue.CallNext("Counter 1");
+        first.Serve();
+
+        var called = queue.CallNext("Counter 1");
+
+        Assert.Same(second, called);
+    }
+
+    [Fact]
+    public void CallNext_TwoCounters_GetDifferentTokens()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        var second = queue.Join("Rahul");
+
+        var calledByCounter1 = queue.CallNext("Counter 1");
+        var calledByCounter2 = queue.CallNext("Counter 2");
+
+        Assert.Same(first, calledByCounter1);
+        Assert.Same(second, calledByCounter2);
+    }
 }

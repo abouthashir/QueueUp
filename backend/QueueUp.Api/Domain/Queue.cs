@@ -47,6 +47,15 @@ public class Queue
 
     public Token? CallNext(string counterName)
     {
+        Token? current = _tokens.FirstOrDefault(token =>
+            token.Status == TokenStatus.Called && token.CounterName == counterName);
+
+        if (current != null)
+        {
+            throw new InvalidOperationException(
+                $"{counterName} is still serving {current.DisplayNumber}. Mark it served or skipped first.");
+        }
+
         Token? next = _tokens
             .Where(token => token.Status == TokenStatus.Waiting)
             .OrderBy(token => token.Number)
