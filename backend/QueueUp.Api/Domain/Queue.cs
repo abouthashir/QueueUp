@@ -30,6 +30,7 @@ public class Queue
         var token = new Token
         {
             Id = Guid.NewGuid(),
+            QueueId = Id,
             Prefix = Prefix,
             Number = _tokens.Count + 1,
             CustomerName = customerName,
@@ -68,5 +69,10 @@ public class Queue
 
         next.Call(counterName);
         return next;
+    }
+
+    public Token? FindToken(Guid tokenId)
+    {
+        return _tokens.FirstOrDefault(token => token.Id == tokenId);
     }
 }

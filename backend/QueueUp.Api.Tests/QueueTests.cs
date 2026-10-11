@@ -192,4 +192,39 @@ public class QueueTests
         Assert.Same(first, calledByCounter1);
         Assert.Same(second, calledByCounter2);
     }
+
+    // FindToken: look up a token by its secret Id
+
+    [Fact]
+    public void Join_TokenRemembersItsQueue()
+    {
+        var queue = CreateOpenQueue();
+
+        var token = queue.Join("Anu");
+
+        Assert.Equal(queue.Id, token.QueueId);
+    }
+
+    [Fact]
+    public void FindToken_ExistingId_ReturnsThatToken()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu");
+        var second = queue.Join("Rahul");
+
+        var found = queue.FindToken(second.Id);
+
+        Assert.Same(second, found);
+    }
+
+    [Fact]
+    public void FindToken_UnknownId_ReturnsNull()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu");
+
+        var found = queue.FindToken(Guid.NewGuid());
+
+        Assert.Null(found);
+    }
 }
