@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:5204
+@queueId = c250ddb5-277c-4dd9-b1d6-e3b230bb69ac
+
+### List all queues
+GET {{baseUrl}}/api/queues
+
+### Get the demo queue
+GET {{baseUrl}}/api/queues/{{queueId}}
+
+### Get a queue that does not exist (expect 404 with a message)
+GET {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222
+
+### Not a valid Guid (expect 404 from the route constraint)
+GET {{baseUrl}}/api/queues/abc
