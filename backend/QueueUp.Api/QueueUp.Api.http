@@ -67,3 +67,29 @@ POST {{baseUrl}}/api/queues/{{queueId}}/call-next
 Content-Type: application/json
 
 {}
+
+### Rahul joins the demo queue
+# @name joinRahul
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Rahul"
+}
+
+### Staff: serve Anu (she must be Called first)
+POST {{baseUrl}}/api/tokens/{{joinAnu.response.body.$.id}}/serve
+
+### Staff: skip Rahul (he must be Called first)
+POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/skip
+
+### Staff: Counter 2 recalls Rahul (he must be Skipped first)
+POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/recall
+Content-Type: application/json
+
+{
+  "counterName": "Counter 2"
+}
+
+### Customer: Rahul cancels (only allowed while Waiting)
+POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/cancel

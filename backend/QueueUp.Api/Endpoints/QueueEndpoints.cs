@@ -72,34 +72,34 @@ public static class QueueEndpoints
         });
 
         app.MapPost("/api/queues/{queueId:guid}/call-next", (Guid queueId, CounterRequest request, QueueStore store) =>
-{
-    if (string.IsNullOrWhiteSpace(request.CounterName))
-    {
-        return Results.BadRequest(new { message = "Counter name is required." });
-    }
-
-    Queue? queue = store.FindQueue(queueId);
-
-    if (queue == null)
-    {
-        return ApiErrors.QueueNotFound(queueId);
-    }
-
-    try
-    {
-        Token? token = queue.CallNext(request.CounterName);
-
-        if (token == null)
         {
-            return Results.NoContent();
-        }
+            if (string.IsNullOrWhiteSpace(request.CounterName))
+            {
+                return Results.BadRequest(new { message = "Counter name is required." });
+            }
 
-        return Results.Ok(TokenResponse.From(queue, token));
-    }
-    catch (InvalidOperationException exception)
-    {
-        return ApiErrors.Conflict(exception);
-    }
-});
+            Queue? queue = store.FindQueue(queueId);
+
+            if (queue == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            try
+            {
+                Token? token = queue.CallNext(request.CounterName);
+
+                if (token == null)
+                {
+                    return Results.NoContent();
+                }
+
+                return Results.Ok(TokenResponse.From(queue, token));
+            }
+            catch (InvalidOperationException exception)
+            {
+                return ApiErrors.Conflict(exception);
+            }
+        });
     }
 }
