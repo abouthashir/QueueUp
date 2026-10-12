@@ -53,3 +53,17 @@ Content-Type: application/json
 
 ### Staff open the queue again (expect 200, status Open)
 POST {{baseUrl}}/api/queues/{{queueId}}/open
+
+### Staff: Counter 1 calls next (200 with a token, or 204 if nobody is waiting)
+POST {{baseUrl}}/api/queues/{{queueId}}/call-next
+Content-Type: application/json
+
+{
+  "counterName": "Counter 1"
+}
+
+### Staff: call next without a counter name (expect 400)
+POST {{baseUrl}}/api/queues/{{queueId}}/call-next
+Content-Type: application/json
+
+{}
