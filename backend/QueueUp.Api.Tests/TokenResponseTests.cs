@@ -1,0 +1,51 @@
+using QueueUp.Api.Contracts;
+using QueueUp.Api.Domain;
+
+namespace QueueUp.Api.Tests;
+
+public class TokenResponseTests
+{
+    private static Queue CreateOpenQueue()
+    {
+        var queue = new Queue
+        {
+            Id = Guid.NewGuid(),
+            Name = "General OPD",
+            Prefix = 'A',
+            AverageServiceMinutes = 5
+        };
+        queue.Open();
+        return queue;
+    }
+
+    [Fact]
+    public void From_WaitingToken_ShowsPeopleAheadAndWait()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu");
+        queue.Join("Rahul");
+        var third = queue.Join("Meera");
+
+        var response = TokenResponse.From(queue, third);
+
+        Assert.Equal("A-003", response.DisplayNumber);
+        Assert.Equal("General OPD", response.QueueName);
+        Assert.Equal(2, response.PeopleAhead);
+        Assert.Equal(10, response.EstimatedWaitMinutes);
+    }
+
+    [Fact]
+    public void From_CalledToken_HasNobodyAheadAndNoWait()
+    {
+        var queue = CreateOpenQueue();
+        var first = queue.Join("Anu");
+        queue.CallNext("Counter 1");
+
+        var response = TokenResponse.From(queue, first);
+
+        Assert.Equal(TokenStatus.Called, response.Status);
+        Assert.Equal("Counter 1", response.CounterName);
+        Assert.Equal(0, response.PeopleAhead);
+        Assert.Equal(0, response.EstimatedWaitMinutes);
+    }
+}
