@@ -55,19 +55,23 @@ app.MapPost("/api/queues/{queueId:guid}/tokens", (Guid queueId, JoinQueueRequest
     }
 });
 
-// Sample token for checking the JSON shape; replaced by real endpoints in the queue logic
-app.MapGet("/api/tokens/demo", () =>
+app.MapGet("/api/tokens/{tokenId:guid}", (Guid tokenId, QueueStore store) =>
 {
-    var token = new Token
-    {
-        Id = Guid.NewGuid(),
-        Prefix = 'A',
-        Number = 14,
-        CustomerName = "Anu",
-        CreatedAt = DateTimeOffset.UtcNow
-    };
+    Token? token = store.FindToken(tokenId);
 
-    return token;
+    if (token == null)
+    {
+        return Results.NotFound(new { message = $"Token {tokenId} was not found." });
+    }
+
+    Queue? queue = store.FindQueue(token.QueueId);
+
+    if (queue == null)
+    {
+        return Results.NotFound(new { message = $"Queue {token.QueueId} was not found." });
+    }
+
+    return Results.Ok(TokenResponse.From(queue, token));
 });
 
 app.Run();

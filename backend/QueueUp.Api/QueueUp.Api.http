@@ -14,6 +14,7 @@ GET {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222
 GET {{baseUrl}}/api/queues/abc
 
 ### Anu joins the demo queue (expect 201 Created)
+# @name joinAnu
 POST {{baseUrl}}/api/queues/{{queueId}}/tokens
 Content-Type: application/json
 
@@ -32,3 +33,9 @@ POST {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222/tokens
 Content-Type: application/json
 
 {}
+
+### View Anu's token (run "Anu joins" first)
+GET {{baseUrl}}/api/tokens/{{joinAnu.response.body.$.id}}
+
+### View a token that does not exist (expect 404)
+GET {{baseUrl}}/api/tokens/33333333-3333-3333-3333-333333333333
