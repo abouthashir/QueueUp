@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
 
@@ -32,6 +33,26 @@ app.MapGet("/api/queues/{queueId:guid}", (Guid queueId, QueueStore store) =>
     }
 
     return Results.Ok(queue);
+});
+
+app.MapPost("/api/queues/{queueId:guid}/tokens", (Guid queueId, JoinQueueRequest request, QueueStore store) =>
+{
+    Queue? queue = store.FindQueue(queueId);
+
+    if (queue == null)
+    {
+        return Results.NotFound(new { message = $"Queue {queueId} was not found." });
+    }
+
+    try
+    {
+        Token token = queue.Join(request.CustomerName);
+        return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Conflict(new { message = exception.Message });
+    }
 });
 
 // Sample token for checking the JSON shape; replaced by real endpoints in the queue logic

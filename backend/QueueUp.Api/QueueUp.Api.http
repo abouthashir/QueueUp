@@ -12,3 +12,23 @@ GET {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222
 
 ### Not a valid Guid (expect 404 from the route constraint)
 GET {{baseUrl}}/api/queues/abc
+
+### Anu joins the demo queue (expect 201 Created)
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Anu"
+}
+
+### A walk-in customer joins without a name (expect 201, customerName null)
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{}
+
+### Join a queue that does not exist (expect 404)
+POST {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222/tokens
+Content-Type: application/json
+
+{}
