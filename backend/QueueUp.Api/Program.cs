@@ -74,4 +74,30 @@ app.MapGet("/api/tokens/{tokenId:guid}", (Guid tokenId, QueueStore store) =>
     return Results.Ok(TokenResponse.From(queue, token));
 });
 
+app.MapPost("/api/queues/{queueId:guid}/pause", (Guid queueId, QueueStore store) =>
+{
+    Queue? queue = store.FindQueue(queueId);
+
+    if (queue == null)
+    {
+        return Results.NotFound(new { message = $"Queue {queueId} was not found." });
+    }
+
+    queue.Pause();
+    return Results.Ok(queue);
+});
+
+app.MapPost("/api/queues/{queueId:guid}/open", (Guid queueId, QueueStore store) =>
+{
+    Queue? queue = store.FindQueue(queueId);
+
+    if (queue == null)
+    {
+        return Results.NotFound(new { message = $"Queue {queueId} was not found." });
+    }
+
+    queue.Open();
+    return Results.Ok(queue);
+});
+
 app.Run();

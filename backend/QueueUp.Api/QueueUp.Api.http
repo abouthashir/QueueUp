@@ -39,3 +39,17 @@ GET {{baseUrl}}/api/tokens/{{joinAnu.response.body.$.id}}
 
 ### View a token that does not exist (expect 404)
 GET {{baseUrl}}/api/tokens/33333333-3333-3333-3333-333333333333
+
+### Staff pause the queue (expect 200, status Paused)
+POST {{baseUrl}}/api/queues/{{queueId}}/pause
+
+### Join while paused (expect 409 Conflict)
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Meera"
+}
+
+### Staff open the queue again (expect 200, status Open)
+POST {{baseUrl}}/api/queues/{{queueId}}/open
