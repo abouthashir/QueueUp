@@ -20,12 +20,14 @@ public class Queue
         Status = QueueStatus.Paused;
     }
 
-    public Token Join(string? customerName)
+    public Token Join(string? customerName, DateTimeOffset now)
     {
         if (Status != QueueStatus.Open)
         {
             throw new InvalidOperationException($"Queue {Name} is not accepting new tokens because it is {Status}.");
         }
+
+        DateOnly today = ServiceDay.For(now);
 
         var token = new Token
         {
@@ -34,7 +36,8 @@ public class Queue
             Prefix = Prefix,
             Number = _tokens.Count + 1,
             CustomerName = customerName,
-            CreatedAt = DateTimeOffset.UtcNow
+            CreatedAt = now,
+            ServiceDate = today
         };
 
         _tokens.Add(token);

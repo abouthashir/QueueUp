@@ -17,6 +17,7 @@ builder.Services.AddDbContext<QueueUpDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<QueueStore>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 

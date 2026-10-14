@@ -5,6 +5,7 @@ namespace QueueUp.Api.Tests;
 
 public class TokenResponseTests
 {
+    private static readonly DateTimeOffset Morning = new(2026, 10, 15, 9, 0, 0, TimeSpan.FromHours(5.5));
     private static Queue CreateOpenQueue()
     {
         var queue = new Queue
@@ -22,9 +23,9 @@ public class TokenResponseTests
     public void From_WaitingToken_ShowsPeopleAheadAndWait()
     {
         var queue = CreateOpenQueue();
-        queue.Join("Anu");
-        queue.Join("Rahul");
-        var third = queue.Join("Meera");
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        var third = queue.Join("Meera", Morning);
 
         var response = TokenResponse.From(queue, third);
 
@@ -38,7 +39,7 @@ public class TokenResponseTests
     public void From_CalledToken_HasNobodyAheadAndNoWait()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
+        var first = queue.Join("Anu", Morning);
         queue.CallNext("Counter 1");
 
         var response = TokenResponse.From(queue, first);

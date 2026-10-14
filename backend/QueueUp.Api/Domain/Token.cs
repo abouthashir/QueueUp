@@ -10,6 +10,7 @@ public class Token
     public string? CustomerName { get; init; }
     public string? CounterName { get; private set; }
     public DateTimeOffset CreatedAt { get; init; }
+    public DateOnly ServiceDate { get; init; }
 
     public string DisplayNumber => $"{Prefix}-{Number:D3}";
 

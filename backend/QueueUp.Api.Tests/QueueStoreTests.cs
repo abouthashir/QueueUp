@@ -6,6 +6,7 @@ namespace QueueUp.Api.Tests;
 
 public class QueueStoreTests
 {
+    private static readonly DateTimeOffset Morning = new(2026, 10, 15, 9, 0, 0, TimeSpan.FromHours(5.5));
     private static QueueUpDbContext CreateDatabase(string databaseName)
     {
         var options = new DbContextOptionsBuilder<QueueUpDbContext>()
@@ -46,7 +47,7 @@ public class QueueStoreTests
         var firstStore = new QueueStore(CreateDatabase(databaseName));
         var queue = await firstStore.FindQueueAsync(QueueStore.DemoQueueId);
         Assert.NotNull(queue);
-        var token = queue.Join("Anu");
+        var token = queue.Join("Anu", Morning);
         await firstStore.SaveChangesAsync();
 
         var secondStore = new QueueStore(CreateDatabase(databaseName));
@@ -64,13 +65,13 @@ public class QueueStoreTests
         var firstStore = new QueueStore(CreateDatabase(databaseName));
         var queue = await firstStore.FindQueueAsync(QueueStore.DemoQueueId);
         Assert.NotNull(queue);
-        queue.Join("Anu");
+        queue.Join("Anu", Morning);
         await firstStore.SaveChangesAsync();
 
         var secondStore = new QueueStore(CreateDatabase(databaseName));
         var reloaded = await secondStore.FindQueueAsync(QueueStore.DemoQueueId);
         Assert.NotNull(reloaded);
-        var next = reloaded.Join("Rahul");
+        var next = reloaded.Join("Rahul", Morning);
 
         Assert.Equal(2, next.Number);
     }

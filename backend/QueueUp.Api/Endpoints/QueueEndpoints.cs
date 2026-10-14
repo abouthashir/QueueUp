@@ -25,7 +25,7 @@ public static class QueueEndpoints
             return Results.Ok(queue);
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueAsync(queueId);
 
@@ -36,7 +36,7 @@ public static class QueueEndpoints
 
             try
             {
-                Token token = queue.Join(request.CustomerName);
+                Token token = queue.Join(request.CustomerName, clock.GetUtcNow());
                 await store.SaveChangesAsync();
                 return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
             }

@@ -4,6 +4,9 @@ namespace QueueUp.Api.Tests;
 
 public class QueueTests
 {
+
+    private static readonly DateTimeOffset Morning = new(2026, 10, 15, 9, 0, 0, TimeSpan.FromHours(5.5));
+
     private static Queue CreateOpenQueue()
     {
         var queue = new Queue
@@ -30,7 +33,7 @@ public class QueueTests
     {
         var queue = CreateOpenQueue();
 
-        var token = queue.Join("Anu");
+        var token = queue.Join("Anu", Morning);
 
         Assert.Equal(1, token.Number);
         Assert.Equal("A-001", token.DisplayNumber);
@@ -43,9 +46,9 @@ public class QueueTests
     {
         var queue = CreateOpenQueue();
 
-        var first = queue.Join("Anu");
-        var second = queue.Join(null);
-        var third = queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        var second = queue.Join(null, Morning);
+        var third = queue.Join("Rahul", Morning);
 
         Assert.Equal(1, first.Number);
         Assert.Equal(2, second.Number);
@@ -57,7 +60,7 @@ public class QueueTests
     {
         var queue = new Queue { Name = "General OPD", Prefix = 'A' };
 
-        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu"));
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu", Morning));
 
         Assert.Equal("Queue General OPD is not accepting new tokens because it is Closed.", exception.Message);
     }
@@ -68,7 +71,7 @@ public class QueueTests
         var queue = CreateOpenQueue();
         queue.Pause();
 
-        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu"));
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu", Morning));
 
         Assert.Equal("Queue General OPD is not accepting new tokens because it is Paused.", exception.Message);
     }
@@ -77,9 +80,9 @@ public class QueueTests
     public void CountPeopleAhead_ThirdCustomer_HasTwoAhead()
     {
         var queue = CreateOpenQueue();
-        queue.Join("Anu");
-        queue.Join("Rahul");
-        var third = queue.Join("Meera");
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        var third = queue.Join("Meera", Morning);
 
         int ahead = queue.CountPeopleAhead(third);
 
@@ -90,8 +93,8 @@ public class QueueTests
     public void CountPeopleAhead_FirstCustomer_HasNobodyAhead()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
 
         int ahead = queue.CountPeopleAhead(first);
 
@@ -102,9 +105,9 @@ public class QueueTests
     public void CountPeopleAhead_IgnoresTokensThatAreNoLongerWaiting()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        var second = queue.Join("Rahul");
-        var third = queue.Join("Meera");
+        var first = queue.Join("Anu", Morning);
+        var second = queue.Join("Rahul", Morning);
+        var third = queue.Join("Meera", Morning);
         first.Call("Counter 1");
         second.Cancel();
 
@@ -119,8 +122,8 @@ public class QueueTests
     public void CallNext_CallsOldestWaitingToken()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
 
         var called = queue.CallNext("Counter 1");
 
@@ -133,8 +136,8 @@ public class QueueTests
     public void CallNext_PassesOverTokensThatAreNotWaiting()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        var second = queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        var second = queue.Join("Rahul", Morning);
         first.Cancel();
 
         var called = queue.CallNext("Counter 1");
@@ -156,8 +159,8 @@ public class QueueTests
     public void CallNext_CounterStillServing_Throws()
     {
         var queue = CreateOpenQueue();
-        queue.Join("Anu");
-        queue.Join("Rahul");
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
         queue.CallNext("Counter 1");
 
         var exception = Assert.Throws<InvalidOperationException>(() => queue.CallNext("Counter 1"));
@@ -169,8 +172,8 @@ public class QueueTests
     public void CallNext_AfterServing_CallsTheNextToken()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        var second = queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        var second = queue.Join("Rahul", Morning);
         queue.CallNext("Counter 1");
         first.Serve();
 
@@ -183,8 +186,8 @@ public class QueueTests
     public void CallNext_TwoCounters_GetDifferentTokens()
     {
         var queue = CreateOpenQueue();
-        var first = queue.Join("Anu");
-        var second = queue.Join("Rahul");
+        var first = queue.Join("Anu", Morning);
+        var second = queue.Join("Rahul", Morning);
 
         var calledByCounter1 = queue.CallNext("Counter 1");
         var calledByCounter2 = queue.CallNext("Counter 2");
@@ -200,7 +203,7 @@ public class QueueTests
     {
         var queue = CreateOpenQueue();
 
-        var token = queue.Join("Anu");
+        var token = queue.Join("Anu", Morning);
 
         Assert.Equal(queue.Id, token.QueueId);
     }
@@ -209,8 +212,8 @@ public class QueueTests
     public void FindToken_ExistingId_ReturnsThatToken()
     {
         var queue = CreateOpenQueue();
-        queue.Join("Anu");
-        var second = queue.Join("Rahul");
+        queue.Join("Anu", Morning);
+        var second = queue.Join("Rahul", Morning);
 
         var found = queue.FindToken(second.Id);
 
@@ -221,10 +224,23 @@ public class QueueTests
     public void FindToken_UnknownId_ReturnsNull()
     {
         var queue = CreateOpenQueue();
-        queue.Join("Anu");
+        queue.Join("Anu", Morning);
 
         var found = queue.FindToken(Guid.NewGuid());
 
         Assert.Null(found);
+    }
+
+    // Service day: numbers restart every morning (India time)
+
+    [Fact]
+    public void Join_RecordsTheTimeAndServiceDay()
+    {
+        var queue = CreateOpenQueue();
+
+        var token = queue.Join("Anu", Morning);
+
+        Assert.Equal(Morning, token.CreatedAt);
+        Assert.Equal(new DateOnly(2026, 10, 15), token.ServiceDate);
     }
 }
