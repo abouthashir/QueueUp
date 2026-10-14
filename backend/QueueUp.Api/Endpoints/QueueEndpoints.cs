@@ -8,14 +8,14 @@ public static class QueueEndpoints
 {
     public static void MapQueueEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/queues", (QueueStore store) =>
+        app.MapGet("/api/queues", async (QueueStore store) =>
         {
-            return store.GetAll();
+            return await store.GetAllAsync();
         });
 
-        app.MapGet("/api/queues/{queueId:guid}", (Guid queueId, QueueStore store) =>
+        app.MapGet("/api/queues/{queueId:guid}", async (Guid queueId, QueueStore store) =>
         {
-            Queue? queue = store.FindQueue(queueId);
+            Queue? queue = await store.FindQueueAsync(queueId);
 
             if (queue == null)
             {
@@ -25,9 +25,9 @@ public static class QueueEndpoints
             return Results.Ok(queue);
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/tokens", (Guid queueId, JoinQueueRequest request, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store) =>
         {
-            Queue? queue = store.FindQueue(queueId);
+            Queue? queue = await store.FindQueueAsync(queueId);
 
             if (queue == null)
             {
@@ -37,6 +37,7 @@ public static class QueueEndpoints
             try
             {
                 Token token = queue.Join(request.CustomerName);
+                await store.SaveChangesAsync();
                 return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
             }
             catch (InvalidOperationException exception)
@@ -45,9 +46,9 @@ public static class QueueEndpoints
             }
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/pause", (Guid queueId, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, QueueStore store) =>
         {
-            Queue? queue = store.FindQueue(queueId);
+            Queue? queue = await store.FindQueueAsync(queueId);
 
             if (queue == null)
             {
@@ -55,12 +56,13 @@ public static class QueueEndpoints
             }
 
             queue.Pause();
+            await store.SaveChangesAsync();
             return Results.Ok(queue);
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/open", (Guid queueId, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/open", async (Guid queueId, QueueStore store) =>
         {
-            Queue? queue = store.FindQueue(queueId);
+            Queue? queue = await store.FindQueueAsync(queueId);
 
             if (queue == null)
             {
@@ -68,17 +70,18 @@ public static class QueueEndpoints
             }
 
             queue.Open();
+            await store.SaveChangesAsync();
             return Results.Ok(queue);
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/call-next", (Guid queueId, CounterRequest request, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, CounterRequest request, QueueStore store) =>
         {
             if (string.IsNullOrWhiteSpace(request.CounterName))
             {
                 return Results.BadRequest(new { message = "Counter name is required." });
             }
 
-            Queue? queue = store.FindQueue(queueId);
+            Queue? queue = await store.FindQueueAsync(queueId);
 
             if (queue == null)
             {
@@ -93,6 +96,8 @@ public static class QueueEndpoints
                 {
                     return Results.NoContent();
                 }
+
+                await store.SaveChangesAsync();
 
                 return Results.Ok(TokenResponse.From(queue, token));
             }

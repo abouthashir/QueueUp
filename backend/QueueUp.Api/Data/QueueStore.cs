@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using QueueUp.Api.Domain;
 
 namespace QueueUp.Api.Data;
@@ -6,44 +7,32 @@ public class QueueStore
 {
     public static readonly Guid DemoQueueId = Guid.Parse("c250ddb5-277c-4dd9-b1d6-e3b230bb69ac");
 
-    private readonly List<Queue> _queues = new();
+    private readonly QueueUpDbContext _db;
 
-    public QueueStore()
+    public QueueStore(QueueUpDbContext db)
     {
-        var demoQueue = new Queue
-        {
-            Id = DemoQueueId,
-            Name = "General OPD",
-            Prefix = 'A',
-            AverageServiceMinutes = 5
-        };
-
-        demoQueue.Open();
-        _queues.Add(demoQueue);
+        _db = db;
     }
 
-    public IReadOnlyList<Queue> GetAll()
+    public async Task<List<Queue>> GetAllAsync()
     {
-        return _queues;
+        return await _db.Queues.ToListAsync();
     }
 
-    public Queue? FindQueue(Guid queueId)
+    public async Task<Queue?> FindQueueAsync(Guid queueId)
     {
-        return _queues.FirstOrDefault(queue => queue.Id == queueId);
+        return await _db.Queues
+            .Include("_tokens")
+            .FirstOrDefaultAsync(queue => queue.Id == queueId);
     }
 
-    public Token? FindToken(Guid tokenId)
+    public async Task<Token?> FindTokenAsync(Guid tokenId)
     {
-        foreach (Queue queue in _queues)
-        {
-            Token? token = queue.FindToken(tokenId);
+        return await _db.Tokens.FirstOrDefaultAsync(token => token.Id == tokenId);
+    }
 
-            if (token != null)
-            {
-                return token;
-            }
-        }
-
-        return null;
+    public async Task SaveChangesAsync()
+    {
+        await _db.SaveChangesAsync();
     }
 }

@@ -16,8 +16,7 @@ string connectionString = builder.Configuration.GetConnectionString("QueueUp")
 builder.Services.AddDbContext<QueueUpDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-
-builder.Services.AddSingleton<QueueStore>();
+builder.Services.AddScoped<QueueStore>();
 
 var app = builder.Build();
 
