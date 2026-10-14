@@ -256,4 +256,17 @@ public class QueueTests
         Assert.Equal(1, tomorrow.Number);
         Assert.Equal("A-001", tomorrow.DisplayNumber);
     }
+
+    [Fact]
+    public void CountPeopleAhead_IgnoresTokensFromOtherDays()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Old", Morning.AddDays(-1));
+        queue.Join("Anu", Morning);
+        var rahul = queue.Join("Rahul", Morning);
+
+        int ahead = queue.CountPeopleAhead(rahul);
+
+        Assert.Equal(1, ahead);
+    }
 }
