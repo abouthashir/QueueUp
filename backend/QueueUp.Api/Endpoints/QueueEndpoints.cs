@@ -74,7 +74,7 @@ public static class QueueEndpoints
             return Results.Ok(queue);
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, CounterRequest request, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, CounterRequest request, QueueStore store, TimeProvider clock) =>
         {
             if (string.IsNullOrWhiteSpace(request.CounterName))
             {
@@ -90,7 +90,7 @@ public static class QueueEndpoints
 
             try
             {
-                Token? token = queue.CallNext(request.CounterName);
+                Token? token = queue.CallNext(request.CounterName, clock.GetUtcNow());
 
                 if (token == null)
                 {

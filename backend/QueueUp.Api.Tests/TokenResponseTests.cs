@@ -40,7 +40,7 @@ public class TokenResponseTests
     {
         var queue = CreateOpenQueue();
         var first = queue.Join("Anu", Morning);
-        queue.CallNext("Counter 1");
+        queue.CallNext("Counter 1", Morning);
 
         var response = TokenResponse.From(queue, first);
 

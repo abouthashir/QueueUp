@@ -125,7 +125,7 @@ public class QueueTests
         var first = queue.Join("Anu", Morning);
         queue.Join("Rahul", Morning);
 
-        var called = queue.CallNext("Counter 1");
+        var called = queue.CallNext("Counter 1", Morning);
 
         Assert.Same(first, called);
         Assert.Equal(TokenStatus.Called, first.Status);
@@ -140,7 +140,7 @@ public class QueueTests
         var second = queue.Join("Rahul", Morning);
         first.Cancel();
 
-        var called = queue.CallNext("Counter 1");
+        var called = queue.CallNext("Counter 1", Morning);
 
         Assert.Same(second, called);
     }
@@ -150,7 +150,7 @@ public class QueueTests
     {
         var queue = CreateOpenQueue();
 
-        var called = queue.CallNext("Counter 1");
+        var called = queue.CallNext("Counter 1", Morning);
 
         Assert.Null(called);
     }
@@ -161,9 +161,9 @@ public class QueueTests
         var queue = CreateOpenQueue();
         queue.Join("Anu", Morning);
         queue.Join("Rahul", Morning);
-        queue.CallNext("Counter 1");
+        queue.CallNext("Counter 1", Morning);
 
-        var exception = Assert.Throws<InvalidOperationException>(() => queue.CallNext("Counter 1"));
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.CallNext("Counter 1", Morning));
 
         Assert.Equal("Counter 1 is still serving A-001. Mark it served or skipped first.", exception.Message);
     }
@@ -174,10 +174,10 @@ public class QueueTests
         var queue = CreateOpenQueue();
         var first = queue.Join("Anu", Morning);
         var second = queue.Join("Rahul", Morning);
-        queue.CallNext("Counter 1");
+        queue.CallNext("Counter 1", Morning);
         first.Serve();
 
-        var called = queue.CallNext("Counter 1");
+        var called = queue.CallNext("Counter 1", Morning);
 
         Assert.Same(second, called);
     }
@@ -189,8 +189,8 @@ public class QueueTests
         var first = queue.Join("Anu", Morning);
         var second = queue.Join("Rahul", Morning);
 
-        var calledByCounter1 = queue.CallNext("Counter 1");
-        var calledByCounter2 = queue.CallNext("Counter 2");
+        var calledByCounter1 = queue.CallNext("Counter 1", Morning);
+        var calledByCounter2 = queue.CallNext("Counter 2", Morning);
 
         Assert.Same(first, calledByCounter1);
         Assert.Same(second, calledByCounter2);
@@ -268,5 +268,17 @@ public class QueueTests
         int ahead = queue.CountPeopleAhead(rahul);
 
         Assert.Equal(1, ahead);
+    }
+
+    [Fact]
+    public void CallNext_IgnoresWaitingTokensFromYesterday()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Old", Morning.AddDays(-1));
+        var today = queue.Join("Anu", Morning);
+
+        var called = queue.CallNext("Counter 1", Morning);
+
+        Assert.Same(today, called);
     }
 }

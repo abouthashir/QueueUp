@@ -52,7 +52,7 @@ public class Queue
             && other.Number < token.Number);
     }
 
-    public Token? CallNext(string counterName)
+    public Token? CallNext(string counterName, DateTimeOffset now)
     {
         Token? current = _tokens.FirstOrDefault(token =>
             token.Status == TokenStatus.Called && token.CounterName == counterName);
@@ -63,8 +63,10 @@ public class Queue
                 $"{counterName} is still serving {current.DisplayNumber}. Mark it served or skipped first.");
         }
 
+        DateOnly today = ServiceDay.For(now);
+
         Token? next = _tokens
-            .Where(token => token.Status == TokenStatus.Waiting)
+            .Where(token => token.ServiceDate == today && token.Status == TokenStatus.Waiting)
             .OrderBy(token => token.Number)
             .FirstOrDefault();
 
