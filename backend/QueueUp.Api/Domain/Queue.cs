@@ -34,7 +34,7 @@ public class Queue
             Id = Guid.NewGuid(),
             QueueId = Id,
             Prefix = Prefix,
-            Number = _tokens.Count + 1,
+            Number = _tokens.Count(other => other.ServiceDate == today) + 1,
             CustomerName = customerName,
             CreatedAt = now,
             ServiceDate = today

@@ -243,4 +243,17 @@ public class QueueTests
         Assert.Equal(Morning, token.CreatedAt);
         Assert.Equal(new DateOnly(2026, 10, 15), token.ServiceDate);
     }
+
+    [Fact]
+    public void Join_NextDay_NumberingRestartsAtOne()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+
+        var tomorrow = queue.Join("Meera", Morning.AddDays(1));
+
+        Assert.Equal(1, tomorrow.Number);
+        Assert.Equal("A-001", tomorrow.DisplayNumber);
+    }
 }
