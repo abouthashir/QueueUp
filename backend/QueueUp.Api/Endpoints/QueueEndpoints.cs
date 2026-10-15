@@ -13,7 +13,7 @@ public static class QueueEndpoints
             return await store.GetAllAsync();
         });
 
-        app.MapGet("/api/queues/{queueId:guid}", async (Guid queueId, QueueStore store) =>
+        app.MapGet("/api/queues/{queueId:guid}", async (Guid queueId, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueAsync(queueId);
 
@@ -22,7 +22,7 @@ public static class QueueEndpoints
                 return ApiErrors.QueueNotFound(queueId);
             }
 
-            return Results.Ok(queue);
+            return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
         });
 
         app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store, TimeProvider clock) =>

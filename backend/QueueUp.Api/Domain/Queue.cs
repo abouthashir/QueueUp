@@ -69,6 +69,12 @@ public class Queue
         return token;
     }
 
+    public int CountWaiting(DateTimeOffset now)
+    {
+        DateOnly today = ServiceDay.For(now);
+        return _tokens.Count(token => token.ServiceDate == today && token.Status == TokenStatus.Waiting);
+    }
+
     public int CountPeopleAhead(Token token)
     {
         return _tokens.Count(other =>

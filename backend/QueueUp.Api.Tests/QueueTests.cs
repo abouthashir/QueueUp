@@ -327,4 +327,19 @@ public class QueueTests
         Assert.Equal("Counter 1 is still serving A-001. Mark it served or skipped before closing.", exception.Message);
         Assert.Equal(QueueStatus.Open, queue.Status);
     }
+
+    [Fact]
+    public void CountWaiting_CountsOnlyTodaysWaitingTokens()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Old", Morning.AddDays(-1));
+        var anu = queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        queue.Join("Meera", Morning);
+        anu.Cancel();
+
+        int waiting = queue.CountWaiting(Morning);
+
+        Assert.Equal(2, waiting);
+    }
 }
