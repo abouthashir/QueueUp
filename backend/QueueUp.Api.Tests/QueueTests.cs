@@ -314,4 +314,17 @@ public class QueueTests
 
         Assert.Equal("Queue General OPD is not accepting new tokens because it is Closed.", exception.Message);
     }
+
+    [Fact]
+    public void Close_WhileATokenIsCalled_Throws()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu", Morning);
+        queue.CallNext("Counter 1", Morning);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Close());
+
+        Assert.Equal("Counter 1 is still serving A-001. Mark it served or skipped before closing.", exception.Message);
+        Assert.Equal(QueueStatus.Open, queue.Status);
+    }
 }

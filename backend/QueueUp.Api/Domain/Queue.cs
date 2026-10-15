@@ -22,6 +22,14 @@ public class Queue
 
     public void Close()
     {
+        Token? current = _tokens.FirstOrDefault(token => token.Status == TokenStatus.Called);
+
+        if (current != null)
+        {
+            throw new InvalidOperationException(
+                $"{current.CounterName} is still serving {current.DisplayNumber}. Mark it served or skipped before closing.");
+        }
+
         foreach (Token token in _tokens)
         {
             if (token.Status == TokenStatus.Waiting)
