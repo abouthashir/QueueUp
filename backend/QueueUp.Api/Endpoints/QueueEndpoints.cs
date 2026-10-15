@@ -74,6 +74,27 @@ public static class QueueEndpoints
             return Results.Ok(queue);
         });
 
+        app.MapPost("/api/queues/{queueId:guid}/close", async (Guid queueId, QueueStore store) =>
+        {
+            Queue? queue = await store.FindQueueAsync(queueId);
+
+            if (queue == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            try
+            {
+                queue.Close();
+                await store.SaveChangesAsync();
+                return Results.Ok(queue);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return ApiErrors.Conflict(exception);
+            }
+        });
+
         app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, CounterRequest request, QueueStore store, TimeProvider clock) =>
         {
             if (string.IsNullOrWhiteSpace(request.CounterName))

@@ -93,3 +93,14 @@ Content-Type: application/json
 
 ### Customer: Rahul cancels (only allowed while Waiting)
 POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/cancel
+
+### Staff close the queue for the day (409 if someone is still being served)
+POST {{baseUrl}}/api/queues/{{queueId}}/close
+
+### Join after closing (expect 409: the queue is Closed)
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Late arrival"
+}
