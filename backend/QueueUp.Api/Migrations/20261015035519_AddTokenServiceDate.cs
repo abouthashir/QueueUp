@@ -23,7 +23,7 @@ namespace QueueUp.Api.Migrations
                 defaultValue: new DateOnly(1, 1, 1));
 
             migrationBuilder.Sql(
-    "UPDATE Tokens SET ServiceDate = CAST(SWITCHOFFSET(CreatedAt, '+05:30') AS date)");
+                "UPDATE Tokens SET ServiceDate = CAST(SWITCHOFFSET(CreatedAt, '+05:30') AS date)");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tokens_QueueId_ServiceDate_Number",

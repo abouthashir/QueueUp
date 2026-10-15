@@ -35,13 +35,13 @@ public class QueueUpDbContext : DbContext
         });
 
         modelBuilder.Entity<Token>(token =>
-       {
-           token.Property(t => t.Id).ValueGeneratedNever();
-           token.Property(t => t.Status).HasConversion<string>().HasMaxLength(20);
-           token.Property(t => t.CustomerName).HasMaxLength(100);
-           token.Property(t => t.CounterName).HasMaxLength(50);
+        {
+            token.Property(t => t.Id).ValueGeneratedNever();
+            token.Property(t => t.Status).HasConversion<string>().HasMaxLength(20);
+            token.Property(t => t.CustomerName).HasMaxLength(100);
+            token.Property(t => t.CounterName).HasMaxLength(50);
 
-           token.HasIndex(t => new { t.QueueId, t.ServiceDate, t.Number }).IsUnique();
-       });
+            token.HasIndex(t => new { t.QueueId, t.ServiceDate, t.Number }).IsUnique();
+        });
     }
 }
