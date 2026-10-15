@@ -281,4 +281,37 @@ public class QueueTests
 
         Assert.Same(today, called);
     }
+
+    // Close: end of the day
+
+    [Fact]
+    public void Close_CancelsWaitingTokensAndMarksSkippedAsNoShow()
+    {
+        var queue = CreateOpenQueue();
+        var served = queue.Join("Anu", Morning);
+        var skipped = queue.Join("Rahul", Morning);
+        var waiting = queue.Join("Meera", Morning);
+        queue.CallNext("Counter 1", Morning);
+        served.Serve();
+        queue.CallNext("Counter 1", Morning);
+        skipped.Skip();
+
+        queue.Close();
+
+        Assert.Equal(QueueStatus.Closed, queue.Status);
+        Assert.Equal(TokenStatus.Served, served.Status);
+        Assert.Equal(TokenStatus.NoShow, skipped.Status);
+        Assert.Equal(TokenStatus.Cancelled, waiting.Status);
+    }
+
+    [Fact]
+    public void Close_ThenJoin_Throws()
+    {
+        var queue = CreateOpenQueue();
+        queue.Close();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Anu", Morning));
+
+        Assert.Equal("Queue General OPD is not accepting new tokens because it is Closed.", exception.Message);
+    }
 }

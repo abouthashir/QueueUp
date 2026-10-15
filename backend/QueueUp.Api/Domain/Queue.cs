@@ -20,6 +20,23 @@ public class Queue
         Status = QueueStatus.Paused;
     }
 
+    public void Close()
+    {
+        foreach (Token token in _tokens)
+        {
+            if (token.Status == TokenStatus.Waiting)
+            {
+                token.Cancel();
+            }
+            else if (token.Status == TokenStatus.Skipped)
+            {
+                token.MarkNoShow();
+            }
+        }
+
+        Status = QueueStatus.Closed;
+    }
+
     public Token Join(string? customerName, DateTimeOffset now)
     {
         if (Status != QueueStatus.Open)
