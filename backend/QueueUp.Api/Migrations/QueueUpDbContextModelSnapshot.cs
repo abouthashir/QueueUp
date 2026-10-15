@@ -17,7 +17,7 @@ namespace QueueUp.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -86,6 +86,9 @@ namespace QueueUp.Api.Migrations
                     b.Property<Guid>("QueueId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateOnly>("ServiceDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -93,7 +96,8 @@ namespace QueueUp.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QueueId");
+                    b.HasIndex("QueueId", "ServiceDate", "Number")
+                        .IsUnique();
 
                     b.ToTable("Tokens");
                 });
