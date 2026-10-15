@@ -145,4 +145,27 @@ public class TokenTests
 
         Assert.Equal("Token A-014 cannot be cancelled because it is Called.", exception.Message);
     }
+
+    [Fact]
+    public void MarkNoShow_SkippedToken_BecomesNoShow()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+        token.Skip();
+
+        token.MarkNoShow();
+
+        Assert.Equal(TokenStatus.NoShow, token.Status);
+    }
+
+    [Fact]
+    public void MarkNoShow_CalledToken_Throws()
+    {
+        var token = CreateWaitingToken();
+        token.Call("Counter 2");
+
+        var exception = Assert.Throws<InvalidOperationException>(() => token.MarkNoShow());
+
+        Assert.Equal("Token A-014 cannot be marked as no-show because it is Called.", exception.Message);
+    }
 }

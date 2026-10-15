@@ -46,6 +46,12 @@ public class Token
         Status = TokenStatus.Cancelled;
     }
 
+    public void MarkNoShow()
+    {
+        EnsureStatus(TokenStatus.Skipped, "marked as no-show");
+        Status = TokenStatus.NoShow;
+    }
+
     private void EnsureStatus(TokenStatus requiredStatus, string action)
     {
         if (Status != requiredStatus)
