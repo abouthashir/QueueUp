@@ -104,3 +104,9 @@ Content-Type: application/json
 {
   "customerName": "Late arrival"
 }
+
+### Staff: Counter 1's dashboard
+GET {{baseUrl}}/api/queues/{{queueId}}/dashboard?counterName=Counter 1
+
+### Dashboard without a counter name (expect 400)
+GET {{baseUrl}}/api/queues/{{queueId}}/dashboard

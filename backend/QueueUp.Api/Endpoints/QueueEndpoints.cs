@@ -7,6 +7,7 @@ namespace QueueUp.Api.Endpoints;
 public static class QueueEndpoints
 {
     private const int MaxAttempts = 5;
+
     public static void MapQueueEndpoints(this WebApplication app)
     {
         app.MapGet("/api/queues", async (QueueStore store) =>
@@ -74,7 +75,7 @@ public static class QueueEndpoints
             return ApiErrors.Busy();
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueAsync(queueId);
 
@@ -85,10 +86,10 @@ public static class QueueEndpoints
 
             queue.Pause();
             await store.SaveChangesAsync();
-            return Results.Ok(queue);
+            return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/open", async (Guid queueId, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/open", async (Guid queueId, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueAsync(queueId);
 
@@ -99,10 +100,10 @@ public static class QueueEndpoints
 
             queue.Open();
             await store.SaveChangesAsync();
-            return Results.Ok(queue);
+            return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/close", async (Guid queueId, QueueStore store) =>
+        app.MapPost("/api/queues/{queueId:guid}/close", async (Guid queueId, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueAsync(queueId);
 
@@ -115,7 +116,7 @@ public static class QueueEndpoints
             {
                 queue.Close();
                 await store.SaveChangesAsync();
-                return Results.Ok(queue);
+                return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
             }
             catch (InvalidOperationException exception)
             {
