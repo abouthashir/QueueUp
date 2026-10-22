@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { getQueue, type QueueInfo } from '../api';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { getQueue, joinQueue, type QueueInfo } from '../api';
 
 export default function JoinPage() {
   const { queueId } = useParams();
+  const navigate = useNavigate();
 
   const [queue, setQueue] = useState<QueueInfo | null>(null);
+  const [customerName, setCustomerName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [joining, setJoining] = useState(false);
 
   useEffect(() => {
     if (!queueId) {
@@ -26,7 +29,26 @@ export default function JoinPage() {
     load();
   }, [queueId]);
 
-  if (error) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!queueId) {
+      return;
+    }
+
+    setJoining(true);
+    setError(null);
+
+    try {
+      const token = await joinQueue(queueId, customerName);
+      navigate(`/t/${token.id}`);
+    } catch (e) {
+      setError((e as Error).message);
+      setJoining(false);
+    }
+  }
+
+  if (error && !queue) {
     return (
       <main className="page">
         <p className="error" role="alert">{error}</p>
@@ -53,17 +75,28 @@ export default function JoinPage() {
             {queue.estimatedWaitMinutes} min
           </p>
 
-          <form className="join-form">
+          <form onSubmit={handleSubmit} className="join-form">
             <label htmlFor="customer-name">Your name (optional)</label>
-            <input id="customer-name" type="text" autoComplete="given-name" maxLength={100} />
+            <input
+              id="customer-name"
+              type="text"
+              autoComplete="given-name"
+              maxLength={100}
+              value={customerName}
+              onChange={(event) => setCustomerName(event.target.value)}
+            />
 
-            <button type="submit">Get token</button>
+            <button type="submit" disabled={joining}>
+              {joining ? 'Getting your token…' : 'Get token'}
+            </button>
           </form>
         </>
       )}
 
       {queue.status === 'Paused' && <p className="notice">The queue is paused. Back soon.</p>}
       {queue.status === 'Closed' && <p className="notice">The queue is closed for today.</p>}
+
+      {error && <p className="error" role="alert">{error}</p>}
     </main>
   );
 }

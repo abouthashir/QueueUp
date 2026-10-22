@@ -43,6 +43,14 @@ export function getQueue(queueId: string): Promise<QueueInfo> {
   return request<QueueInfo>(`/api/queues/${queueId}`);
 }
 
+export function joinQueue(queueId: string, customerName: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/queues/${queueId}/tokens`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ customerName: customerName.trim() || null }),
+  });
+}
+
 export function getToken(tokenId: string): Promise<TokenInfo> {
   return request<TokenInfo>(`/api/tokens/${tokenId}`);
 }
