@@ -1,12 +1,24 @@
 const API_URL: string = import.meta.env.VITE_API_URL;
 
 export type QueueStatus = 'Closed' | 'Open' | 'Paused';
+export type TokenStatus = 'Waiting' | 'Called' | 'Served' | 'Skipped' | 'Cancelled' | 'NoShow';
 
 export interface QueueInfo {
   id: string;
   name: string;
   status: QueueStatus;
   peopleWaiting: number;
+  estimatedWaitMinutes: number;
+}
+
+export interface TokenInfo {
+  id: string;
+  displayNumber: string;
+  status: TokenStatus;
+  queueName: string;
+  customerName: string | null;
+  counterName: string | null;
+  peopleAhead: number;
   estimatedWaitMinutes: number;
 }
 
@@ -29,4 +41,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export function getQueue(queueId: string): Promise<QueueInfo> {
   return request<QueueInfo>(`/api/queues/${queueId}`);
+}
+
+export function getToken(tokenId: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}`);
 }
