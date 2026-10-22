@@ -22,6 +22,21 @@ export interface TokenInfo {
   estimatedWaitMinutes: number;
 }
 
+export interface TokenSummary {
+  id: string;
+  displayNumber: string;
+  customerName: string | null;
+}
+
+export interface Dashboard {
+  queue: QueueInfo;
+  counterName: string;
+  nowServing: TokenInfo | null;
+  waiting: TokenSummary[];
+  skipped: TokenSummary[];
+  servedToday: number;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
 
@@ -34,6 +49,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     throw new Error(body?.message ?? 'Something went wrong. Please try again.');
+  }
+
+  if (response.status === 204) {
+    return null as T;
   }
 
   return (await response.json()) as T;
@@ -57,4 +76,32 @@ export function getToken(tokenId: string): Promise<TokenInfo> {
 
 export function leaveQueue(tokenId: string): Promise<TokenInfo> {
   return request<TokenInfo>(`/api/tokens/${tokenId}/cancel`, { method: 'POST' });
+}
+
+export function getDashboard(queueId: string, counterName: string): Promise<Dashboard> {
+  return request<Dashboard>(`/api/queues/${queueId}/dashboard?counterName=${encodeURIComponent(counterName)}`);
+}
+
+export function callNext(queueId: string, counterName: string): Promise<TokenInfo | null> {
+  return request<TokenInfo | null>(`/api/queues/${queueId}/call-next`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ counterName }),
+  });
+}
+
+export function serveToken(tokenId: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}/serve`, { method: 'POST' });
+}
+
+export function skipToken(tokenId: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}/skip`, { method: 'POST' });
+}
+
+export function recallToken(tokenId: string, counterName: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}/recall`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ counterName }),
+  });
 }
