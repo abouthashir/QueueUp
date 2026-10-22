@@ -16,4 +16,9 @@ public static class ApiErrors
     {
         return Results.Conflict(new { message = exception.Message });
     }
+
+    public static IResult Busy()
+    {
+        return Results.Conflict(new { message = "Many people are using the queue right now. Please try again." });
+    }
 }

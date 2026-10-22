@@ -35,4 +35,18 @@ public class QueueStore
     {
         await _db.SaveChangesAsync();
     }
+
+    public async Task<bool> TrySaveChangesAsync()
+    {
+        try
+        {
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            _db.ChangeTracker.Clear();
+            return false;
+        }
+    }
 }

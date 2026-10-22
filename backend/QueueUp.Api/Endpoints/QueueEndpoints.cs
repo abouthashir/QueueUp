@@ -6,6 +6,7 @@ namespace QueueUp.Api.Endpoints;
 
 public static class QueueEndpoints
 {
+    private const int MaxAttempts = 5;
     public static void MapQueueEndpoints(this WebApplication app)
     {
         app.MapGet("/api/queues", async (QueueStore store) =>
@@ -102,30 +103,38 @@ public static class QueueEndpoints
                 return Results.BadRequest(new { message = "Counter name is required." });
             }
 
-            Queue? queue = await store.FindQueueAsync(queueId);
-
-            if (queue == null)
+            for (int attempt = 1; attempt <= MaxAttempts; attempt++)
             {
-                return ApiErrors.QueueNotFound(queueId);
-            }
+                Queue? queue = await store.FindQueueAsync(queueId);
 
-            try
-            {
-                Token? token = queue.CallNext(request.CounterName, clock.GetUtcNow());
+                if (queue == null)
+                {
+                    return ApiErrors.QueueNotFound(queueId);
+                }
+
+                Token? token;
+
+                try
+                {
+                    token = queue.CallNext(request.CounterName, clock.GetUtcNow());
+                }
+                catch (InvalidOperationException exception)
+                {
+                    return ApiErrors.Conflict(exception);
+                }
 
                 if (token == null)
                 {
                     return Results.NoContent();
                 }
 
-                await store.SaveChangesAsync();
+                if (await store.TrySaveChangesAsync())
+                {
+                    return Results.Ok(TokenResponse.From(queue, token));
+                }
+            }
 
-                return Results.Ok(TokenResponse.From(queue, token));
-            }
-            catch (InvalidOperationException exception)
-            {
-                return ApiErrors.Conflict(exception);
-            }
+            return ApiErrors.Busy();
         });
     }
 }
