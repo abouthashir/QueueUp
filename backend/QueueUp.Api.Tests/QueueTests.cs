@@ -342,4 +342,33 @@ public class QueueTests
 
         Assert.Equal(2, waiting);
     }
+
+    // Dashboard: what a counter needs to see
+
+    [Fact]
+    public void TokensToday_ReturnsOnlyTodaysTokensWithThatStatus_InNumberOrder()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Old", Morning.AddDays(-1));
+        var anu = queue.Join("Anu", Morning);
+        var rahul = queue.Join("Rahul", Morning);
+        var meera = queue.Join("Meera", Morning);
+        rahul.Cancel();
+
+        var waiting = queue.TokensToday(TokenStatus.Waiting, Morning);
+
+        Assert.Equal(new[] { anu, meera }, waiting);
+    }
+
+    [Fact]
+    public void CurrentTokenAt_ReturnsTheTokenBeingServedAtThatCounter()
+    {
+        var queue = CreateOpenQueue();
+        var anu = queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        queue.CallNext("Counter 1", Morning);
+
+        Assert.Same(anu, queue.CurrentTokenAt("Counter 1"));
+        Assert.Null(queue.CurrentTokenAt("Counter 2"));
+    }
 }

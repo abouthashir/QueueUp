@@ -71,8 +71,23 @@ public class Queue
 
     public int CountWaiting(DateTimeOffset now)
     {
+        return TokensToday(TokenStatus.Waiting, now).Count;
+    }
+
+    public IReadOnlyList<Token> TokensToday(TokenStatus status, DateTimeOffset now)
+    {
         DateOnly today = ServiceDay.For(now);
-        return _tokens.Count(token => token.ServiceDate == today && token.Status == TokenStatus.Waiting);
+
+        return _tokens
+            .Where(token => token.ServiceDate == today && token.Status == status)
+            .OrderBy(token => token.Number)
+            .ToList();
+    }
+
+    public Token? CurrentTokenAt(string counterName)
+    {
+        return _tokens.FirstOrDefault(token =>
+            token.Status == TokenStatus.Called && token.CounterName == counterName);
     }
 
     public int CountPeopleAhead(Token token)
@@ -85,8 +100,7 @@ public class Queue
 
     public Token? CallNext(string counterName, DateTimeOffset now)
     {
-        Token? current = _tokens.FirstOrDefault(token =>
-            token.Status == TokenStatus.Called && token.CounterName == counterName);
+        Token? current = CurrentTokenAt(counterName);
 
         if (current != null)
         {
@@ -94,12 +108,7 @@ public class Queue
                 $"{counterName} is still serving {current.DisplayNumber}. Mark it served or skipped first.");
         }
 
-        DateOnly today = ServiceDay.For(now);
-
-        Token? next = _tokens
-            .Where(token => token.ServiceDate == today && token.Status == TokenStatus.Waiting)
-            .OrderBy(token => token.Number)
-            .FirstOrDefault();
+        Token? next = TokensToday(TokenStatus.Waiting, now).FirstOrDefault();
 
         if (next == null)
         {
