@@ -105,3 +105,15 @@ export function recallToken(tokenId: string, counterName: string): Promise<Token
     body: JSON.stringify({ counterName }),
   });
 }
+
+export function pauseQueue(queueId: string): Promise<QueueInfo> {
+  return request<QueueInfo>(`/api/queues/${queueId}/pause`, { method: 'POST' });
+}
+
+export function openQueue(queueId: string): Promise<QueueInfo> {
+  return request<QueueInfo>(`/api/queues/${queueId}/open`, { method: 'POST' });
+}
+
+export function closeQueue(queueId: string): Promise<QueueInfo> {
+  return request<QueueInfo>(`/api/queues/${queueId}/close`, { method: 'POST' });
+}

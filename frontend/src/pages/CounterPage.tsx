@@ -1,6 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
-import { callNext, getDashboard, recallToken, serveToken, skipToken, type Dashboard } from '../api';
+import {
+  callNext,
+  closeQueue,
+  getDashboard,
+  joinQueue,
+  openQueue,
+  pauseQueue,
+  recallToken,
+  serveToken,
+  skipToken,
+  type Dashboard,
+} from '../api';
 import NowServing from '../components/NowServing';
 import TokenList from '../components/TokenList';
 import { loadCounterName, saveCounterName } from '../counterStorage';
@@ -83,6 +94,28 @@ export default function CounterPage() {
     });
   }
 
+  function handleWalkIn() {
+    if (!queueId) {
+      return;
+    }
+
+    const id = queueId;
+
+    runAction(async () => {
+      const token = await joinQueue(id, '');
+      setNotice(`Walk-in token ${token.displayNumber} issued. Tell the customer their number.`);
+    });
+  }
+
+  function handleClose() {
+    if (!queueId || !window.confirm('Close the queue for today? Everyone still waiting will be cancelled.')) {
+      return;
+    }
+
+    const id = queueId;
+    runAction(() => closeQueue(id));
+  }
+
   function handleCounterSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const name = counterInput.trim();
@@ -125,6 +158,8 @@ export default function CounterPage() {
   }
 
   const serving = dashboard.nowServing !== null;
+  const status = dashboard.queue.status;
+  const id = dashboard.queue.id;
 
   return (
     <main className="page page-wide">
@@ -158,6 +193,30 @@ export default function CounterPage() {
         {actionError && <p className="error" role="alert">{actionError}</p>}
         {loadError && <p className="error" role="alert">{loadError}</p>}
       </div>
+
+      <section className="panel">
+        <h2>Queue</h2>
+        <div className="actions">
+          <button type="button" className="secondary" disabled={busy || status !== 'Open'} onClick={handleWalkIn}>
+            Walk-in token
+          </button>
+          {status === 'Open' && (
+            <button type="button" className="secondary" disabled={busy} onClick={() => runAction(() => pauseQueue(id))}>
+              Pause
+            </button>
+          )}
+          {status !== 'Open' && (
+            <button type="button" className="secondary" disabled={busy} onClick={() => runAction(() => openQueue(id))}>
+              Open
+            </button>
+          )}
+          {status !== 'Closed' && (
+            <button type="button" className="secondary" disabled={busy} onClick={handleClose}>
+              Close for today
+            </button>
+          )}
+        </div>
+      </section>
 
       <div className="lists">
         <TokenList title="Waiting" tokens={dashboard.waiting} emptyText="No one is waiting." />
