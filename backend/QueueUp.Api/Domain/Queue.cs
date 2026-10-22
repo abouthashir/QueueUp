@@ -100,13 +100,7 @@ public class Queue
 
     public Token? CallNext(string counterName, DateTimeOffset now)
     {
-        Token? current = CurrentTokenAt(counterName);
-
-        if (current != null)
-        {
-            throw new InvalidOperationException(
-                $"{counterName} is still serving {current.DisplayNumber}. Mark it served or skipped first.");
-        }
+        EnsureCounterIsFree(counterName);
 
         Token? next = TokensToday(TokenStatus.Waiting, now).FirstOrDefault();
 
@@ -119,8 +113,25 @@ public class Queue
         return next;
     }
 
+    public void Recall(Token token, string counterName)
+    {
+        EnsureCounterIsFree(counterName);
+        token.Recall(counterName);
+    }
+
     public Token? FindToken(Guid tokenId)
     {
         return _tokens.FirstOrDefault(token => token.Id == tokenId);
+    }
+
+    private void EnsureCounterIsFree(string counterName)
+    {
+        Token? current = CurrentTokenAt(counterName);
+
+        if (current != null)
+        {
+            throw new InvalidOperationException(
+                $"{counterName} is still serving {current.DisplayNumber}. Mark it served or skipped first.");
+        }
     }
 }

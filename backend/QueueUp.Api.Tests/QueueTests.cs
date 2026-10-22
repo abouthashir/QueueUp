@@ -371,4 +371,36 @@ public class QueueTests
         Assert.Same(anu, queue.CurrentTokenAt("Counter 1"));
         Assert.Null(queue.CurrentTokenAt("Counter 2"));
     }
+
+    // Recall: only to a counter that is free
+
+    [Fact]
+    public void Recall_ToAFreeCounter_CallsTheTokenAgain()
+    {
+        var queue = CreateOpenQueue();
+        var anu = queue.Join("Anu", Morning);
+        queue.CallNext("Counter 1", Morning);
+        anu.Skip();
+
+        queue.Recall(anu, "Counter 2");
+
+        Assert.Equal(TokenStatus.Called, anu.Status);
+        Assert.Equal("Counter 2", anu.CounterName);
+    }
+
+    [Fact]
+    public void Recall_ToACounterStillServing_Throws()
+    {
+        var queue = CreateOpenQueue();
+        var anu = queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        queue.CallNext("Counter 1", Morning);
+        anu.Skip();
+        queue.CallNext("Counter 1", Morning);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Recall(anu, "Counter 1"));
+
+        Assert.Equal("Counter 1 is still serving A-002. Mark it served or skipped first.", exception.Message);
+        Assert.Equal(TokenStatus.Skipped, anu.Status);
+    }
 }

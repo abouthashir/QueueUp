@@ -29,12 +29,12 @@ public static class TokenEndpoints
 
         app.MapPost("/api/tokens/{tokenId:guid}/serve", async (Guid tokenId, QueueStore store) =>
         {
-            return await ChangeTokenAsync(tokenId, store, token => token.Serve());
+            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Serve());
         });
 
         app.MapPost("/api/tokens/{tokenId:guid}/skip", async (Guid tokenId, QueueStore store) =>
         {
-            return await ChangeTokenAsync(tokenId, store, token => token.Skip());
+            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Skip());
         });
 
         app.MapPost("/api/tokens/{tokenId:guid}/recall", async (Guid tokenId, CounterRequest request, QueueStore store) =>
@@ -44,16 +44,16 @@ public static class TokenEndpoints
                 return Results.BadRequest(new { message = "Counter name is required." });
             }
 
-            return await ChangeTokenAsync(tokenId, store, token => token.Recall(request.CounterName));
+            return await ChangeTokenAsync(tokenId, store, (queue, token) => queue.Recall(token, request.CounterName));
         });
 
         app.MapPost("/api/tokens/{tokenId:guid}/cancel", async (Guid tokenId, QueueStore store) =>
         {
-            return await ChangeTokenAsync(tokenId, store, token => token.Cancel());
+            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Cancel());
         });
     }
 
-    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, QueueStore store, Action<Token> change)
+    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, QueueStore store, Action<Queue, Token> change)
     {
         Token? token = await store.FindTokenAsync(tokenId);
 
@@ -71,7 +71,7 @@ public static class TokenEndpoints
 
         try
         {
-            change(token);
+            change(queue, token);
 
             if (!await store.TrySaveChangesAsync())
             {
