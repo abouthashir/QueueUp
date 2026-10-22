@@ -26,6 +26,23 @@ public static class QueueEndpoints
             return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
         });
 
+        app.MapGet("/api/queues/{queueId:guid}/dashboard", async (Guid queueId, string? counterName, QueueStore store, TimeProvider clock) =>
+        {
+            if (string.IsNullOrWhiteSpace(counterName))
+            {
+                return Results.BadRequest(new { message = "Counter name is required." });
+            }
+
+            Queue? queue = await store.FindQueueAsync(queueId);
+
+            if (queue == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            return Results.Ok(DashboardResponse.From(queue, counterName, clock.GetUtcNow()));
+        });
+
         app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store, TimeProvider clock) =>
         {
             for (int attempt = 1; attempt <= MaxAttempts; attempt++)
