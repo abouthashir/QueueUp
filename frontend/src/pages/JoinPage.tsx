@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getQueue, joinQueue, type QueueInfo } from '../api';
+import { getQueue, getToken, joinQueue, type QueueInfo } from '../api';
+import { forgetTokenId, loadTokenId, saveTokenId } from '../tokenStorage';
 
 export default function JoinPage() {
   const { queueId } = useParams();
@@ -19,6 +20,19 @@ export default function JoinPage() {
     const id = queueId;
 
     async function load() {
+      const savedTokenId = loadTokenId(id);
+
+      if (savedTokenId) {
+        const saved = await getToken(savedTokenId).catch(() => null);
+
+        if (saved && (saved.status === 'Waiting' || saved.status === 'Called' || saved.status === 'Skipped')) {
+          navigate(`/t/${saved.id}`, { replace: true });
+          return;
+        }
+
+        forgetTokenId(id);
+      }
+
       try {
         setQueue(await getQueue(id));
       } catch (e) {
@@ -27,7 +41,7 @@ export default function JoinPage() {
     }
 
     load();
-  }, [queueId]);
+  }, [queueId, navigate]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,6 +55,7 @@ export default function JoinPage() {
 
     try {
       const token = await joinQueue(queueId, customerName);
+      saveTokenId(queueId, token.id);
       navigate(`/t/${token.id}`);
     } catch (e) {
       setError((e as Error).message);
