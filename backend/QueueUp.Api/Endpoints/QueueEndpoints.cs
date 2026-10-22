@@ -28,23 +28,33 @@ public static class QueueEndpoints
 
         app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store, TimeProvider clock) =>
         {
-            Queue? queue = await store.FindQueueAsync(queueId);
+            for (int attempt = 1; attempt <= MaxAttempts; attempt++)
+            {
+                Queue? queue = await store.FindQueueAsync(queueId);
 
-            if (queue == null)
-            {
-                return ApiErrors.QueueNotFound(queueId);
+                if (queue == null)
+                {
+                    return ApiErrors.QueueNotFound(queueId);
+                }
+
+                Token token;
+
+                try
+                {
+                    token = queue.Join(request.CustomerName, clock.GetUtcNow());
+                }
+                catch (InvalidOperationException exception)
+                {
+                    return ApiErrors.Conflict(exception);
+                }
+
+                if (await store.TrySaveChangesAsync())
+                {
+                    return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
+                }
             }
 
-            try
-            {
-                Token token = queue.Join(request.CustomerName, clock.GetUtcNow());
-                await store.SaveChangesAsync();
-                return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
-            }
-            catch (InvalidOperationException exception)
-            {
-                return ApiErrors.Conflict(exception);
-            }
+            return ApiErrors.Busy();
         });
 
         app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, QueueStore store) =>

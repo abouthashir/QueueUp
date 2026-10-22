@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using QueueUp.Api.Domain;
 
@@ -44,6 +45,11 @@ public class QueueStore
             return true;
         }
         catch (DbUpdateConcurrencyException)
+        {
+            _db.ChangeTracker.Clear();
+            return false;
+        }
+        catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
         {
             _db.ChangeTracker.Clear();
             return false;
