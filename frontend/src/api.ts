@@ -46,3 +46,7 @@ export function getQueue(queueId: string): Promise<QueueInfo> {
 export function getToken(tokenId: string): Promise<TokenInfo> {
   return request<TokenInfo>(`/api/tokens/${tokenId}`);
 }
+
+export function leaveQueue(tokenId: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}/cancel`, { method: 'POST' });
+}

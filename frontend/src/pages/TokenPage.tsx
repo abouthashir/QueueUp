@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { getToken, type TokenInfo } from '../api';
+import { getToken, leaveQueue, type TokenInfo } from '../api';
+
+const REFRESH_EVERY_MS = 15_000;
 
 function describe(token: TokenInfo): string {
   switch (token.status) {
@@ -34,17 +36,43 @@ export default function TokenPage() {
     }
 
     const id = tokenId;
+    let stopped = false;
 
-    async function load() {
+    async function refresh() {
       try {
-        setToken(await getToken(id));
+        const latest = await getToken(id);
+
+        if (!stopped) {
+          setToken(latest);
+          setError(null);
+        }
       } catch (e) {
-        setError((e as Error).message);
+        if (!stopped) {
+          setError((e as Error).message);
+        }
       }
     }
 
-    load();
+    refresh();
+    const timer = setInterval(refresh, REFRESH_EVERY_MS);
+
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
   }, [tokenId]);
+
+  async function handleLeave() {
+    if (!token || !window.confirm('Leave the queue? You will lose your place.')) {
+      return;
+    }
+
+    try {
+      setToken(await leaveQueue(token.id));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
 
   if (!token) {
     return (
@@ -64,6 +92,14 @@ export default function TokenPage() {
       <p className={`status status-${token.status.toLowerCase()}`} aria-live="polite">
         {describe(token)}
       </p>
+
+      {token.status === 'Waiting' && (
+        <button type="button" className="secondary" onClick={handleLeave}>
+          Leave queue
+        </button>
+      )}
+
+      {error && <p className="error" role="alert">{error}</p>}
     </main>
   );
 }
