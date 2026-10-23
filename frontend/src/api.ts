@@ -1,4 +1,4 @@
-const API_URL: string = import.meta.env.VITE_API_URL;
+export const API_URL: string = import.meta.env.VITE_API_URL;
 
 export type QueueStatus = 'Closed' | 'Open' | 'Paused';
 export type TokenStatus = 'Waiting' | 'Called' | 'Served' | 'Skipped' | 'Cancelled' | 'NoShow';
@@ -13,9 +13,11 @@ export interface QueueInfo {
 
 export interface TokenInfo {
   id: string;
+  queueId: string;
   displayNumber: string;
   status: TokenStatus;
   queueName: string;
+  queueStatus: QueueStatus;
   customerName: string | null;
   counterName: string | null;
   peopleAhead: number;
