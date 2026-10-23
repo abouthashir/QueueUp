@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
+import { alertCustomer, enableAlerts } from '../alerts';
 import { getToken, leaveQueue, type TokenInfo } from '../api';
 import ConnectionNotice from '../components/ConnectionNotice';
 import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 15_000;
+
+function isNext(token: TokenInfo): boolean {
+  return token.status === 'Waiting' && token.peopleAhead === 0;
+}
 
 function describe(token: TokenInfo): string {
   switch (token.status) {
@@ -34,6 +39,8 @@ export default function TokenPage() {
 
   const [token, setToken] = useState<TokenInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [alertsOn, setAlertsOn] = useState(false);
+  const previousToken = useRef<TokenInfo | null>(null);
   const { changeCount, liveStatus } = useQueueUpdates(token?.queueId);
   const shouldPoll = liveStatus === 'reconnecting' || liveStatus === 'offline';
 
@@ -69,6 +76,33 @@ export default function TokenPage() {
     };
   }, [tokenId, changeCount, shouldPoll]);
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    const before = previousToken.current;
+    previousToken.current = token;
+
+    if (!alertsOn || !before) {
+      return;
+    }
+
+    if (token.status === 'Called' && before.status !== 'Called') {
+      alertCustomer(`Please go to ${token.counterName}`, `Token ${token.displayNumber} is being called.`);
+    } else if (isNext(token) && !isNext(before)) {
+      alertCustomer("You're next!", `Token ${token.displayNumber} is first in line.`);
+    }
+  }, [token, alertsOn]);
+
+  async function handleEnableAlerts() {
+    try {
+      await enableAlerts();
+    } finally {
+      setAlertsOn(true);
+    }
+  }
+
   async function handleLeave() {
     if (!token || !window.confirm('Leave the queue? You will lose your place.')) {
       return;
@@ -100,6 +134,16 @@ export default function TokenPage() {
       <p className={`status status-${token.status.toLowerCase()}`} aria-live="polite">
         {describe(token)}
       </p>
+
+      {token.status === 'Waiting' && !alertsOn && (
+        <button type="button" onClick={handleEnableAlerts}>
+          Turn on alerts
+        </button>
+      )}
+
+      {token.status === 'Waiting' && alertsOn && (
+        <p className="muted">Alerts are on. Keep this page open and we'll beep when it's your turn.</p>
+      )}
 
       {token.status === 'Waiting' && (
         <button type="button" className="secondary" onClick={handleLeave}>
