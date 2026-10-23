@@ -110,3 +110,6 @@ GET {{baseUrl}}/api/queues/{{queueId}}/dashboard?counterName=Counter 1
 
 ### Dashboard without a counter name (expect 400)
 GET {{baseUrl}}/api/queues/{{queueId}}/dashboard
+
+### SignalR handshake (Lesson 11)
+POST {{baseUrl}}/hubs/queue/negotiate?negotiateVersion=1
