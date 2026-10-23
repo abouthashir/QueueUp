@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using QueueUp.Api.Auth;
 using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
@@ -28,33 +30,29 @@ public static class TokenEndpoints
             return Results.Ok(TokenResponse.From(queue, token));
         });
 
-        app.MapPost("/api/tokens/{tokenId:guid}/serve", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/serve", async (Guid tokenId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Serve());
-        });
+            return await ChangeTokenAsync(tokenId, user.GetBusinessId(), store, notifier, (_, token) => token.Serve());
+        }).RequireAuthorization();
 
-        app.MapPost("/api/tokens/{tokenId:guid}/skip", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/skip", async (Guid tokenId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Skip());
-        });
+            return await ChangeTokenAsync(tokenId, user.GetBusinessId(), store, notifier, (_, token) => token.Skip());
+        }).RequireAuthorization();
 
-        app.MapPost("/api/tokens/{tokenId:guid}/recall", async (Guid tokenId, CounterRequest request, QueueStore store, QueueNotifier notifier) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/recall", async (Guid tokenId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier) =>
         {
-            if (string.IsNullOrWhiteSpace(request.CounterName))
-            {
-                return Results.BadRequest(new { message = "Counter name is required." });
-            }
-
-            return await ChangeTokenAsync(tokenId, store, notifier, (queue, token) => queue.Recall(token, request.CounterName));
-        });
+            string counterName = user.GetCounterName();
+            return await ChangeTokenAsync(tokenId, user.GetBusinessId(), store, notifier, (queue, token) => queue.Recall(token, counterName));
+        }).RequireAuthorization();
 
         app.MapPost("/api/tokens/{tokenId:guid}/cancel", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Cancel());
+            return await ChangeTokenAsync(tokenId, null, store, notifier, (_, token) => token.Cancel());
         });
     }
 
-    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, QueueStore store, QueueNotifier notifier, Action<Queue, Token> change)
+    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, Guid? staffBusinessId, QueueStore store, QueueNotifier notifier, Action<Queue, Token> change)
     {
         Token? token = await store.FindTokenAsync(tokenId);
 
@@ -68,6 +66,11 @@ public static class TokenEndpoints
         if (queue == null)
         {
             return ApiErrors.QueueNotFound(token.QueueId);
+        }
+
+        if (staffBusinessId != null && queue.BusinessId != staffBusinessId)
+        {
+            return ApiErrors.TokenNotFound(tokenId);
         }
 
         try

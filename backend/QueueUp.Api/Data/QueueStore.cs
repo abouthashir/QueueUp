@@ -16,9 +16,20 @@ public class QueueStore
         _db = db;
     }
 
-    public async Task<List<Queue>> GetAllAsync()
+    public async Task<List<Queue>> GetQueuesForBusinessAsync(Guid businessId)
     {
-        return await _db.Queues.ToListAsync();
+        return await _db.Queues
+            .Include("_tokens")
+            .Where(queue => queue.BusinessId == businessId)
+            .OrderBy(queue => queue.Name)
+            .ToListAsync();
+    }
+
+    public async Task<Queue?> FindQueueForBusinessAsync(Guid queueId, Guid businessId)
+    {
+        return await _db.Queues
+            .Include("_tokens")
+            .FirstOrDefaultAsync(queue => queue.Id == queueId && queue.BusinessId == businessId);
     }
 
     public async Task<Queue?> FindQueueAsync(Guid queueId)
@@ -56,6 +67,11 @@ public class QueueStore
     public void AddUser(User user)
     {
         _db.Users.Add(user);
+    }
+
+    public void AddQueue(Queue queue)
+    {
+        _db.Queues.Add(queue);
     }
 
     public async Task SaveChangesAsync()

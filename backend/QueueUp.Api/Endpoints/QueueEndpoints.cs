@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using QueueUp.Api.Auth;
 using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
@@ -11,10 +13,37 @@ public static class QueueEndpoints
 
     public static void MapQueueEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/queues", async (QueueStore store) =>
+        app.MapGet("/api/queues", async (ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>
         {
-            return await store.GetAllAsync();
-        });
+            List<Queue> queues = await store.GetQueuesForBusinessAsync(user.GetBusinessId());
+            DateTimeOffset now = clock.GetUtcNow();
+
+            return queues.Select(queue => QueueResponse.From(queue, now)).ToList();
+        }).RequireAuthorization();
+
+        app.MapPost("/api/queues", async (CreateQueueRequest request, ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>
+        {
+            string? problem = request.FindProblem();
+
+            if (problem != null)
+            {
+                return Results.BadRequest(new { message = problem });
+            }
+
+            var queue = new Queue
+            {
+                Id = Guid.NewGuid(),
+                BusinessId = user.GetBusinessId(),
+                Name = request.Name.Trim(),
+                Prefix = char.ToUpperInvariant(request.Prefix),
+                AverageServiceMinutes = request.AverageServiceMinutes
+            };
+
+            store.AddQueue(queue);
+            await store.SaveChangesAsync();
+
+            return Results.Created($"/api/queues/{queue.Id}", QueueResponse.From(queue, clock.GetUtcNow()));
+        }).RequireAuthorization(AuthPolicies.OwnerOnly);
 
         app.MapGet("/api/queues/{queueId:guid}", async (Guid queueId, QueueStore store, TimeProvider clock) =>
         {
@@ -28,22 +57,17 @@ public static class QueueEndpoints
             return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
         });
 
-        app.MapGet("/api/queues/{queueId:guid}/dashboard", async (Guid queueId, string? counterName, QueueStore store, TimeProvider clock) =>
+        app.MapGet("/api/queues/{queueId:guid}/dashboard", async (Guid queueId, ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>
         {
-            if (string.IsNullOrWhiteSpace(counterName))
-            {
-                return Results.BadRequest(new { message = "Counter name is required." });
-            }
-
-            Queue? queue = await store.FindQueueAsync(queueId);
+            Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
 
             if (queue == null)
             {
                 return ApiErrors.QueueNotFound(queueId);
             }
 
-            return Results.Ok(DashboardResponse.From(queue, counterName, clock.GetUtcNow()));
-        });
+            return Results.Ok(DashboardResponse.From(queue, user.GetCounterName(), clock.GetUtcNow()));
+        }).RequireAuthorization();
 
         app.MapPost("/api/queues/{queueId:guid}/tokens", async (Guid queueId, JoinQueueRequest request, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {
@@ -77,9 +101,9 @@ public static class QueueEndpoints
             return ApiErrors.Busy();
         });
 
-        app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
+        app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {
-            Queue? queue = await store.FindQueueAsync(queueId);
+            Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
 
             if (queue == null)
             {
@@ -90,11 +114,11 @@ public static class QueueEndpoints
             await store.SaveChangesAsync();
             await notifier.QueueChangedAsync(queueId);
             return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
-        });
+        }).RequireAuthorization();
 
-        app.MapPost("/api/queues/{queueId:guid}/open", async (Guid queueId, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
+        app.MapPost("/api/queues/{queueId:guid}/open", async (Guid queueId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {
-            Queue? queue = await store.FindQueueAsync(queueId);
+            Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
 
             if (queue == null)
             {
@@ -105,11 +129,11 @@ public static class QueueEndpoints
             await store.SaveChangesAsync();
             await notifier.QueueChangedAsync(queueId);
             return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
-        });
+        }).RequireAuthorization();
 
-        app.MapPost("/api/queues/{queueId:guid}/close", async (Guid queueId, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
+        app.MapPost("/api/queues/{queueId:guid}/close", async (Guid queueId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {
-            Queue? queue = await store.FindQueueAsync(queueId);
+            Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
 
             if (queue == null)
             {
@@ -127,18 +151,15 @@ public static class QueueEndpoints
             {
                 return ApiErrors.Conflict(exception);
             }
-        });
+        }).RequireAuthorization();
 
-        app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, CounterRequest request, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
+        app.MapPost("/api/queues/{queueId:guid}/call-next", async (Guid queueId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {
-            if (string.IsNullOrWhiteSpace(request.CounterName))
-            {
-                return Results.BadRequest(new { message = "Counter name is required." });
-            }
+            string counterName = user.GetCounterName();
 
             for (int attempt = 1; attempt <= MaxAttempts; attempt++)
             {
-                Queue? queue = await store.FindQueueAsync(queueId);
+                Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
 
                 if (queue == null)
                 {
@@ -149,7 +170,7 @@ public static class QueueEndpoints
 
                 try
                 {
-                    token = queue.CallNext(request.CounterName, clock.GetUtcNow());
+                    token = queue.CallNext(counterName, clock.GetUtcNow());
                 }
                 catch (InvalidOperationException exception)
                 {
@@ -169,6 +190,6 @@ public static class QueueEndpoints
             }
 
             return ApiErrors.Busy();
-        });
+        }).RequireAuthorization();
     }
 }
