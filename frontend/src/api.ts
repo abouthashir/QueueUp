@@ -1,6 +1,9 @@
+import { forgetAuth, loadAuth } from './authStorage';
+
 export const API_URL: string = import.meta.env.VITE_API_URL;
 
 export type QueueStatus = 'Closed' | 'Open' | 'Paused';
+export type UserRole = 'Owner' | 'Staff';
 export type TokenStatus = 'Waiting' | 'Called' | 'Served' | 'Skipped' | 'Cancelled' | 'NoShow';
 
 export interface QueueInfo {
@@ -39,13 +42,49 @@ export interface Dashboard {
   servedToday: number;
 }
 
+export interface AuthInfo {
+  token: string;
+  expiresAt: string;
+  name: string;
+  role: UserRole;
+  counterName: string;
+  businessName: string;
+}
+
+export interface SignupDetails {
+  businessName: string;
+  name: string;
+  email: string;
+  password: string;
+  counterName: string;
+}
+
+export interface NewQueue {
+  name: string;
+  prefix: string;
+  averageServiceMinutes: number;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const auth = loadAuth();
+  const headers = new Headers(options?.headers);
+
+  if (auth) {
+    headers.set('Authorization', `Bearer ${auth.token}`);
+  }
+
   let response: Response;
 
   try {
-    response = await fetch(`${API_URL}${path}`, options);
+    response = await fetch(`${API_URL}${path}`, { ...options, headers });
   } catch {
     throw new Error('Cannot reach QueueUp. Check your internet connection and try again.');
+  }
+
+  if (response.status === 401 && auth) {
+    forgetAuth();
+    window.location.assign('/login?expired=1');
+    throw new Error('Your session has ended. Please log in again.');
   }
 
   if (!response.ok) {
@@ -80,16 +119,12 @@ export function leaveQueue(tokenId: string): Promise<TokenInfo> {
   return request<TokenInfo>(`/api/tokens/${tokenId}/cancel`, { method: 'POST' });
 }
 
-export function getDashboard(queueId: string, counterName: string): Promise<Dashboard> {
-  return request<Dashboard>(`/api/queues/${queueId}/dashboard?counterName=${encodeURIComponent(counterName)}`);
+export function getDashboard(queueId: string): Promise<Dashboard> {
+  return request<Dashboard>(`/api/queues/${queueId}/dashboard`);
 }
 
-export function callNext(queueId: string, counterName: string): Promise<TokenInfo | null> {
-  return request<TokenInfo | null>(`/api/queues/${queueId}/call-next`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ counterName }),
-  });
+export function callNext(queueId: string): Promise<TokenInfo | null> {
+  return request<TokenInfo | null>(`/api/queues/${queueId}/call-next`, { method: 'POST' });
 }
 
 export function serveToken(tokenId: string): Promise<TokenInfo> {
@@ -100,12 +135,8 @@ export function skipToken(tokenId: string): Promise<TokenInfo> {
   return request<TokenInfo>(`/api/tokens/${tokenId}/skip`, { method: 'POST' });
 }
 
-export function recallToken(tokenId: string, counterName: string): Promise<TokenInfo> {
-  return request<TokenInfo>(`/api/tokens/${tokenId}/recall`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ counterName }),
-  });
+export function recallToken(tokenId: string): Promise<TokenInfo> {
+  return request<TokenInfo>(`/api/tokens/${tokenId}/recall`, { method: 'POST' });
 }
 
 export function pauseQueue(queueId: string): Promise<QueueInfo> {
@@ -118,4 +149,32 @@ export function openQueue(queueId: string): Promise<QueueInfo> {
 
 export function closeQueue(queueId: string): Promise<QueueInfo> {
   return request<QueueInfo>(`/api/queues/${queueId}/close`, { method: 'POST' });
+}
+
+export function signup(details: SignupDetails): Promise<AuthInfo> {
+  return request<AuthInfo>('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(details),
+  });
+}
+
+export function login(email: string, password: string): Promise<AuthInfo> {
+  return request<AuthInfo>('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export function getMyQueues(): Promise<QueueInfo[]> {
+  return request<QueueInfo[]>('/api/queues');
+}
+
+export function createQueue(queue: NewQueue): Promise<QueueInfo> {
+  return request<QueueInfo>('/api/queues', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(queue),
+  });
 }

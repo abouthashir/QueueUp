@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import {
   callNext,
@@ -14,8 +14,8 @@ import {
 } from '../api';
 import ConnectionNotice from '../components/ConnectionNotice';
 import NowServing from '../components/NowServing';
+import StaffHeader from '../components/StaffHeader';
 import TokenList from '../components/TokenList';
-import { loadCounterName, saveCounterName } from '../counterStorage';
 import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 5_000;
@@ -23,8 +23,6 @@ const REFRESH_EVERY_MS = 5_000;
 export default function CounterPage() {
   const { queueId } = useParams();
 
-  const [counterName, setCounterName] = useState(loadCounterName);
-  const [counterInput, setCounterInput] = useState(loadCounterName);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -35,17 +33,16 @@ export default function CounterPage() {
   const shouldPoll = liveStatus === 'reconnecting' || liveStatus === 'offline';
 
   useEffect(() => {
-    if (!queueId || !counterName) {
+    if (!queueId) {
       return;
     }
 
     const id = queueId;
-    const counter = counterName;
     let stopped = false;
 
     async function refresh() {
       try {
-        const latest = await getDashboard(id, counter);
+        const latest = await getDashboard(id);
 
         if (!stopped) {
           setDashboard(latest);
@@ -65,7 +62,7 @@ export default function CounterPage() {
       stopped = true;
       clearInterval(timer);
     };
-  }, [queueId, counterName, reloadCount, changeCount, shouldPoll]);
+  }, [queueId, reloadCount, changeCount, shouldPoll]);
 
   async function runAction(action: () => Promise<unknown>) {
     setBusy(true);
@@ -90,7 +87,7 @@ export default function CounterPage() {
     const id = queueId;
 
     runAction(async () => {
-      const called = await callNext(id, counterName);
+      const called = await callNext(id);
 
       if (!called) {
         setNotice('No one is waiting.');
@@ -120,42 +117,10 @@ export default function CounterPage() {
     runAction(() => closeQueue(id));
   }
 
-  function handleCounterSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const name = counterInput.trim();
-
-    if (!name) {
-      return;
-    }
-
-    saveCounterName(name);
-    setDashboard(null);
-    setCounterName(name);
-  }
-
-  if (!counterName) {
-    return (
-      <main className="page">
-        <h1>Which counter are you?</h1>
-        <form onSubmit={handleCounterSubmit} className="join-form">
-          <label htmlFor="counter-name">Counter name</label>
-          <input
-            id="counter-name"
-            type="text"
-            maxLength={50}
-            placeholder="Counter 1"
-            value={counterInput}
-            onChange={(event) => setCounterInput(event.target.value)}
-          />
-          <button type="submit">Start serving</button>
-        </form>
-      </main>
-    );
-  }
-
   if (!dashboard) {
     return (
       <main className="page">
+        <StaffHeader />
         {loadError ? <p className="error" role="alert">{loadError}</p> : <p className="muted">Loading…</p>}
       </main>
     );
@@ -168,13 +133,11 @@ export default function CounterPage() {
   return (
     <main className="page page-wide">
       <ConnectionNotice liveStatus={liveStatus} />
+      <StaffHeader />
       <header className="counter-header">
         <h1>{dashboard.queue.name}</h1>
         <p className="muted">
-          {counterName} · {dashboard.queue.status} ·{' '}
-          <button type="button" className="link" onClick={() => setCounterName('')}>
-            Change counter
-          </button>
+          {dashboard.counterName} · {dashboard.queue.status}
         </p>
       </header>
 
@@ -231,7 +194,7 @@ export default function CounterPage() {
           emptyText="No skipped tokens."
           actionLabel="Recall"
           busy={busy || serving}
-          onAction={(tokenId) => runAction(() => recallToken(tokenId, counterName))}
+          onAction={(tokenId) => runAction(() => recallToken(tokenId))}
         />
       </div>
     </main>
