@@ -4,9 +4,11 @@ namespace QueueUp.Api.Contracts;
 
 public record TokenResponse(
     Guid Id,
+    Guid QueueId,
     string DisplayNumber,
     TokenStatus Status,
     string QueueName,
+    QueueStatus QueueStatus,
     string? CustomerName,
     string? CounterName,
     int PeopleAhead,
@@ -28,9 +30,11 @@ public record TokenResponse(
 
         return new TokenResponse(
             token.Id,
+            queue.Id,
             token.DisplayNumber,
             token.Status,
             queue.Name,
+            queue.Status,
             token.CustomerName,
             token.CounterName,
             peopleAhead,

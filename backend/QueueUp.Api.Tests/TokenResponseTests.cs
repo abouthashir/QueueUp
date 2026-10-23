@@ -49,4 +49,18 @@ public class TokenResponseTests
         Assert.Equal(0, response.PeopleAhead);
         Assert.Equal(0, response.EstimatedWaitMinutes);
     }
+
+    [Fact]
+    public void From_TokenInClosedQueue_ShowsTheQueueAndItsStatus()
+    {
+        var queue = CreateOpenQueue();
+        var anu = queue.Join("Anu", Morning);
+        queue.Close();
+
+        var response = TokenResponse.From(queue, anu);
+
+        Assert.Equal(queue.Id, response.QueueId);
+        Assert.Equal(QueueStatus.Closed, response.QueueStatus);
+        Assert.Equal(TokenStatus.Cancelled, response.Status);
+    }
 }
