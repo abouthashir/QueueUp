@@ -1,121 +1,15 @@
 @baseUrl = http://localhost:5204
-@queueId = c250ddb5-277c-4dd9-b1d6-e3b230bb69ac
 
-### List all queues
-GET {{baseUrl}}/api/queues
+# Lesson 12: run these from top to bottom after starting the API.
+# Test accounts use the reserved .test domain and throwaway passwords. Never put a real password here.
+# The four "first time only" requests give 409 when run again; that's expected.
 
-### Get the demo queue
-GET {{baseUrl}}/api/queues/{{queueId}}
+@ownerToken = {{ownerLogin.response.body.$.token}}
+@staffToken = {{staffLogin.response.body.$.token}}
+@bankToken = {{bankLogin.response.body.$.token}}
+@queueId = {{myQueues.response.body.$[0].id}}
 
-### Get a queue that does not exist (expect 404 with a message)
-GET {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222
-
-### Not a valid Guid (expect 404 from the route constraint)
-GET {{baseUrl}}/api/queues/abc
-
-### Anu joins the demo queue (expect 201 Created)
-# @name joinAnu
-POST {{baseUrl}}/api/queues/{{queueId}}/tokens
-Content-Type: application/json
-
-{
-  "customerName": "Anu"
-}
-
-### A walk-in customer joins without a name (expect 201, customerName null)
-POST {{baseUrl}}/api/queues/{{queueId}}/tokens
-Content-Type: application/json
-
-{}
-
-### Join a queue that does not exist (expect 404)
-POST {{baseUrl}}/api/queues/22222222-2222-2222-2222-222222222222/tokens
-Content-Type: application/json
-
-{}
-
-### View Anu's token (run "Anu joins" first)
-GET {{baseUrl}}/api/tokens/{{joinAnu.response.body.$.id}}
-
-### View a token that does not exist (expect 404)
-GET {{baseUrl}}/api/tokens/33333333-3333-3333-3333-333333333333
-
-### Staff pause the queue (expect 200, status Paused)
-POST {{baseUrl}}/api/queues/{{queueId}}/pause
-
-### Join while paused (expect 409 Conflict)
-POST {{baseUrl}}/api/queues/{{queueId}}/tokens
-Content-Type: application/json
-
-{
-  "customerName": "Meera"
-}
-
-### Staff open the queue again (expect 200, status Open)
-POST {{baseUrl}}/api/queues/{{queueId}}/open
-
-### Staff: Counter 1 calls next (200 with a token, or 204 if nobody is waiting)
-POST {{baseUrl}}/api/queues/{{queueId}}/call-next
-Content-Type: application/json
-
-{
-  "counterName": "Counter 1"
-}
-
-### Staff: call next without a counter name (expect 400)
-POST {{baseUrl}}/api/queues/{{queueId}}/call-next
-Content-Type: application/json
-
-{}
-
-### Rahul joins the demo queue
-# @name joinRahul
-POST {{baseUrl}}/api/queues/{{queueId}}/tokens
-Content-Type: application/json
-
-{
-  "customerName": "Rahul"
-}
-
-### Staff: serve Anu (she must be Called first)
-POST {{baseUrl}}/api/tokens/{{joinAnu.response.body.$.id}}/serve
-
-### Staff: skip Rahul (he must be Called first)
-POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/skip
-
-### Staff: Counter 2 recalls Rahul (he must be Skipped first)
-POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/recall
-Content-Type: application/json
-
-{
-  "counterName": "Counter 2"
-}
-
-### Customer: Rahul cancels (only allowed while Waiting)
-POST {{baseUrl}}/api/tokens/{{joinRahul.response.body.$.id}}/cancel
-
-### Staff close the queue for the day (409 if someone is still being served)
-POST {{baseUrl}}/api/queues/{{queueId}}/close
-
-### Join after closing (expect 409: the queue is Closed)
-POST {{baseUrl}}/api/queues/{{queueId}}/tokens
-Content-Type: application/json
-
-{
-  "customerName": "Late arrival"
-}
-
-### Staff: Counter 1's dashboard
-GET {{baseUrl}}/api/queues/{{queueId}}/dashboard?counterName=Counter 1
-
-### Dashboard without a counter name (expect 400)
-GET {{baseUrl}}/api/queues/{{queueId}}/dashboard
-
-### SignalR handshake (Lesson 11)
-POST {{baseUrl}}/hubs/queue/negotiate?negotiateVersion=1
-
-### Owner signs up (Lesson 12)
-# @name signup
+### 1. Sunrise Clinic's owner signs up (first time only)
 POST {{baseUrl}}/api/auth/signup
 Content-Type: application/json
 
@@ -127,7 +21,7 @@ Content-Type: application/json
   "counterName": "Counter 1"
 }
 
-### Sign up again with the same email (expect 409)
+### 2. Sign up again with the same email (expect 409)
 POST {{baseUrl}}/api/auth/signup
 Content-Type: application/json
 
@@ -139,7 +33,7 @@ Content-Type: application/json
   "counterName": "Counter 1"
 }
 
-### Sign up with a short password (expect 400)
+### 3. Sign up with a short password (expect 400)
 POST {{baseUrl}}/api/auth/signup
 Content-Type: application/json
 
@@ -151,8 +45,17 @@ Content-Type: application/json
   "counterName": "Counter 1"
 }
 
-### Owner logs in
-# @name login
+### 4. Log in with a wrong password (expect 401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "anil@sunrise.test",
+  "password": "wrong-password"
+}
+
+### 5. Sunrise's owner logs in
+# @name ownerLogin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -161,11 +64,165 @@ Content-Type: application/json
   "password": "test-password-1"
 }
 
-### Log in with a wrong password (expect 401)
+### 6. Owner creates a queue (first time only; it starts Closed)
+POST {{baseUrl}}/api/queues
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "General OPD",
+  "prefix": "a",
+  "averageServiceMinutes": 5
+}
+
+### 7. Owner tries a queue with a bad prefix (expect 400)
+POST {{baseUrl}}/api/queues
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Pharmacy",
+  "prefix": "7",
+  "averageServiceMinutes": 4
+}
+
+### 8. Owner lists their queues (sets {{queueId}} to the first one)
+# @name myQueues
+GET {{baseUrl}}/api/queues
+Authorization: Bearer {{ownerToken}}
+
+### 9. List queues without a pass (expect 401)
+GET {{baseUrl}}/api/queues
+
+### 10. Owner adds Reshma as staff at Counter 2 (first time only)
+POST {{baseUrl}}/api/staff
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Reshma",
+  "email": "reshma@sunrise.test",
+  "password": "test-password-3",
+  "counterName": "Counter 2"
+}
+
+### 11. Reshma logs in
+# @name staffLogin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "anil@sunrise.test",
-  "password": "wrong-password"
+  "email": "reshma@sunrise.test",
+  "password": "test-password-3"
 }
+
+### 12. Reshma tries to create a queue (expect 403: owners only)
+POST {{baseUrl}}/api/queues
+Authorization: Bearer {{staffToken}}
+Content-Type: application/json
+
+{
+  "name": "Lab",
+  "prefix": "L",
+  "averageServiceMinutes": 10
+}
+
+### 13. Reshma opens the queue for the day
+POST {{baseUrl}}/api/queues/{{queueId}}/open
+Authorization: Bearer {{staffToken}}
+
+### 14. Customer Meera joins (public, no pass)
+# @name joinMeera
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Meera"
+}
+
+### 15. Customer Ravi joins (public)
+# @name joinRavi
+POST {{baseUrl}}/api/queues/{{queueId}}/tokens
+Content-Type: application/json
+
+{
+  "customerName": "Ravi"
+}
+
+### 16. Customer views Meera's token (public)
+GET {{baseUrl}}/api/tokens/{{joinMeera.response.body.$.id}}
+
+### 17. Reshma calls next (the counter comes from her pass: Counter 2)
+POST {{baseUrl}}/api/queues/{{queueId}}/call-next
+Authorization: Bearer {{staffToken}}
+
+### 18. Reshma's dashboard
+GET {{baseUrl}}/api/queues/{{queueId}}/dashboard
+Authorization: Bearer {{staffToken}}
+
+### 19. Reshma skips Meera (Meera must be Called)
+POST {{baseUrl}}/api/tokens/{{joinMeera.response.body.$.id}}/skip
+Authorization: Bearer {{staffToken}}
+
+### 20. Reshma recalls Meera to her own counter
+POST {{baseUrl}}/api/tokens/{{joinMeera.response.body.$.id}}/recall
+Authorization: Bearer {{staffToken}}
+
+### 21. Reshma serves Meera
+POST {{baseUrl}}/api/tokens/{{joinMeera.response.body.$.id}}/serve
+Authorization: Bearer {{staffToken}}
+
+### 22. City Bank's owner signs up (first time only)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "businessName": "City Bank",
+  "name": "Bina",
+  "email": "bina@citybank.test",
+  "password": "test-password-4",
+  "counterName": "Desk 1"
+}
+
+### 23. City Bank's owner logs in
+# @name bankLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "bina@citybank.test",
+  "password": "test-password-4"
+}
+
+### 24. City Bank lists its queues (expect [] - none of Sunrise's)
+GET {{baseUrl}}/api/queues
+Authorization: Bearer {{bankToken}}
+
+### 25. City Bank opens Sunrise's dashboard (expect 404)
+GET {{baseUrl}}/api/queues/{{queueId}}/dashboard
+Authorization: Bearer {{bankToken}}
+
+### 26. City Bank calls next on Sunrise's queue (expect 404)
+POST {{baseUrl}}/api/queues/{{queueId}}/call-next
+Authorization: Bearer {{bankToken}}
+
+### 27. City Bank closes Sunrise's queue (expect 404)
+POST {{baseUrl}}/api/queues/{{queueId}}/close
+Authorization: Bearer {{bankToken}}
+
+### 28. City Bank serves Ravi's token (expect 404)
+POST {{baseUrl}}/api/tokens/{{joinRavi.response.body.$.id}}/serve
+Authorization: Bearer {{bankToken}}
+
+### 29. Ravi leaves the queue (public)
+POST {{baseUrl}}/api/tokens/{{joinRavi.response.body.$.id}}/cancel
+
+### 30. Customer join page still works (public)
+GET {{baseUrl}}/api/queues/{{queueId}}
+
+### 31. Reshma closes the queue for the day
+POST {{baseUrl}}/api/queues/{{queueId}}/close
+Authorization: Bearer {{staffToken}}
+
+### 32. SignalR handshake (Lesson 11, public)
+POST {{baseUrl}}/hubs/queue/negotiate?negotiateVersion=1
