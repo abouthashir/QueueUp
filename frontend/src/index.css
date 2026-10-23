@@ -37,7 +37,7 @@ h1 {
   color: var(--color-muted);
 }
 
-.join-form {
+.form {
   display: flex;
   flex-direction: column;
   gap: 8px;
