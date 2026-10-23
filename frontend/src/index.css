@@ -218,3 +218,45 @@ button.link {
   background: #fef3c7;
   color: #78350f;
 }
+
+.staff-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.staff-header a {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.staff-header button.link {
+  margin-left: auto;
+}
+
+.queue-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--color-primary);
+  border-radius: 8px;
+}
+
+.button-link.secondary {
+  color: var(--color-primary-dark);
+  background: transparent;
+  border: 2px solid var(--color-primary);
+}

@@ -90,7 +90,7 @@ export default function JoinPage() {
             {queue.estimatedWaitMinutes} min
           </p>
 
-          <form onSubmit={handleSubmit} className="join-form">
+          <form onSubmit={handleSubmit} className="form">
             <label htmlFor="customer-name">Your name (optional)</label>
             <input
               id="customer-name"
