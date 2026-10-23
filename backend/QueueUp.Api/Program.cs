@@ -20,6 +20,7 @@ builder.Services.AddDbContext<QueueUpDbContext>(options =>
 builder.Services.AddScoped<QueueStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<QueueNotifier>();
 
 string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 

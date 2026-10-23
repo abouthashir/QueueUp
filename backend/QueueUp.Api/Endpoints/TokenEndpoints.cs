@@ -1,6 +1,7 @@
 using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
+using QueueUp.Api.Hubs;
 
 namespace QueueUp.Api.Endpoints;
 
@@ -27,33 +28,33 @@ public static class TokenEndpoints
             return Results.Ok(TokenResponse.From(queue, token));
         });
 
-        app.MapPost("/api/tokens/{tokenId:guid}/serve", async (Guid tokenId, QueueStore store) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/serve", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Serve());
+            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Serve());
         });
 
-        app.MapPost("/api/tokens/{tokenId:guid}/skip", async (Guid tokenId, QueueStore store) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/skip", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Skip());
+            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Skip());
         });
 
-        app.MapPost("/api/tokens/{tokenId:guid}/recall", async (Guid tokenId, CounterRequest request, QueueStore store) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/recall", async (Guid tokenId, CounterRequest request, QueueStore store, QueueNotifier notifier) =>
         {
             if (string.IsNullOrWhiteSpace(request.CounterName))
             {
                 return Results.BadRequest(new { message = "Counter name is required." });
             }
 
-            return await ChangeTokenAsync(tokenId, store, (queue, token) => queue.Recall(token, request.CounterName));
+            return await ChangeTokenAsync(tokenId, store, notifier, (queue, token) => queue.Recall(token, request.CounterName));
         });
 
-        app.MapPost("/api/tokens/{tokenId:guid}/cancel", async (Guid tokenId, QueueStore store) =>
+        app.MapPost("/api/tokens/{tokenId:guid}/cancel", async (Guid tokenId, QueueStore store, QueueNotifier notifier) =>
         {
-            return await ChangeTokenAsync(tokenId, store, (_, token) => token.Cancel());
+            return await ChangeTokenAsync(tokenId, store, notifier, (_, token) => token.Cancel());
         });
     }
 
-    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, QueueStore store, Action<Queue, Token> change)
+    private static async Task<IResult> ChangeTokenAsync(Guid tokenId, QueueStore store, QueueNotifier notifier, Action<Queue, Token> change)
     {
         Token? token = await store.FindTokenAsync(tokenId);
 
@@ -75,6 +76,7 @@ public static class TokenEndpoints
 
             if (!await store.TrySaveChangesAsync())
             {
+                await notifier.QueueChangedAsync(queue.Id);
                 return ApiErrors.TokenChanged();
             }
 
