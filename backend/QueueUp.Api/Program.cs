@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QueueUp.Api.Auth;
 using QueueUp.Api.Data;
+using QueueUp.Api.Domain;
 using QueueUp.Api.Endpoints;
 using QueueUp.Api.Hubs;
 
@@ -22,6 +25,18 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<QueueNotifier>();
 
+JwtOptions jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
+    ?? throw new InvalidOperationException("The 'Jwt' settings are missing.");
+
+if (jwt.SigningKey.Length < 32)
+{
+    throw new InvalidOperationException("'Jwt:SigningKey' must be at least 32 characters. Set it with dotnet user-secrets.");
+}
+
+builder.Services.AddSingleton(jwt);
+builder.Services.AddSingleton<TokenIssuer>();
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
 string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(options =>
@@ -38,6 +53,7 @@ app.MapGet("/", () => "QueueUp API is running");
 
 app.MapGet("/api/health", () => new { status = "ok", service = "QueueUp API" });
 
+app.MapAuthEndpoints();
 app.MapQueueEndpoints();
 app.MapTokenEndpoints();
 app.MapHub<QueueHub>("/hubs/queue");

@@ -26,4 +26,14 @@ public static class ApiErrors
     {
         return Results.Conflict(new { message = "This token was just changed by someone else. Please refresh and try again." });
     }
+
+    public static IResult EmailTaken()
+    {
+        return Results.Conflict(new { message = "An account with this email already exists. Try logging in." });
+    }
+
+    public static IResult WrongLogin()
+    {
+        return Results.Json(new { message = "Email or password is incorrect." }, statusCode: StatusCodes.Status401Unauthorized);
+    }
 }

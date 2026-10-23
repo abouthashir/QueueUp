@@ -113,3 +113,59 @@ GET {{baseUrl}}/api/queues/{{queueId}}/dashboard
 
 ### SignalR handshake (Lesson 11)
 POST {{baseUrl}}/hubs/queue/negotiate?negotiateVersion=1
+
+### Owner signs up (Lesson 12)
+# @name signup
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "businessName": "Sunrise Clinic",
+  "name": "Anil",
+  "email": "anil@sunrise.test",
+  "password": "test-password-1",
+  "counterName": "Counter 1"
+}
+
+### Sign up again with the same email (expect 409)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "businessName": "Another Clinic",
+  "name": "Someone",
+  "email": "ANIL@sunrise.test",
+  "password": "test-password-2",
+  "counterName": "Counter 1"
+}
+
+### Sign up with a short password (expect 400)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "businessName": "Short Clinic",
+  "name": "Sam",
+  "email": "sam@short.test",
+  "password": "short",
+  "counterName": "Counter 1"
+}
+
+### Owner logs in
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": " Anil@Sunrise.test ",
+  "password": "test-password-1"
+}
+
+### Log in with a wrong password (expect 401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "anil@sunrise.test",
+  "password": "wrong-password"
+}
