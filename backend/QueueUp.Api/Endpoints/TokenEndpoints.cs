@@ -76,10 +76,10 @@ public static class TokenEndpoints
 
             if (!await store.TrySaveChangesAsync())
             {
-                await notifier.QueueChangedAsync(queue.Id);
                 return ApiErrors.TokenChanged();
             }
 
+            await notifier.QueueChangedAsync(queue.Id);
             return Results.Ok(TokenResponse.From(queue, token));
         }
         catch (InvalidOperationException exception)

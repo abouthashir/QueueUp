@@ -27,7 +27,7 @@ string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins"
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-                policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+     policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 });
 
 var app = builder.Build();
