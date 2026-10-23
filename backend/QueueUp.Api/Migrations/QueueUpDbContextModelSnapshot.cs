@@ -22,14 +22,38 @@ namespace QueueUp.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("QueueUp.Api.Domain.Business", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Businesses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("5e0b6a3c-8d2f-4c71-9a4e-0f3d2b1c7e65"),
+                            Name = "Demo Clinic"
+                        });
+                });
+
             modelBuilder.Entity("QueueUp.Api.Domain.Queue", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AverageServiceMinutes")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -47,6 +71,8 @@ namespace QueueUp.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BusinessId");
+
                     b.ToTable("Queues");
 
                     b.HasData(
@@ -54,6 +80,7 @@ namespace QueueUp.Api.Migrations
                         {
                             Id = new Guid("c250ddb5-277c-4dd9-b1d6-e3b230bb69ac"),
                             AverageServiceMinutes = 5,
+                            BusinessId = new Guid("5e0b6a3c-8d2f-4c71-9a4e-0f3d2b1c7e65"),
                             Name = "General OPD",
                             Prefix = "A",
                             Status = "Open"
@@ -90,6 +117,7 @@ namespace QueueUp.Api.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Status")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -102,11 +130,72 @@ namespace QueueUp.Api.Migrations
                     b.ToTable("Tokens");
                 });
 
+            modelBuilder.Entity("QueueUp.Api.Domain.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CounterName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("QueueUp.Api.Domain.Queue", b =>
+                {
+                    b.HasOne("QueueUp.Api.Domain.Business", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("QueueUp.Api.Domain.Token", b =>
                 {
                     b.HasOne("QueueUp.Api.Domain.Queue", null)
                         .WithMany("_tokens")
                         .HasForeignKey("QueueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("QueueUp.Api.Domain.User", b =>
+                {
+                    b.HasOne("QueueUp.Api.Domain.Business", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

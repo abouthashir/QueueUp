@@ -5,6 +5,7 @@ public class Queue
     private readonly List<Token> _tokens = new();
 
     public Guid Id { get; init; }
+    public Guid BusinessId { get; init; }
     public required string Name { get; init; }
     public char Prefix { get; init; }
     public int AverageServiceMinutes { get; init; }
