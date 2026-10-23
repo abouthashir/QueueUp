@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { getToken, leaveQueue, type TokenInfo } from '../api';
+import ConnectionNotice from '../components/ConnectionNotice';
+import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 15_000;
 
@@ -18,6 +20,9 @@ function describe(token: TokenInfo): string {
     case 'Skipped':
       return 'You missed your turn. Please speak to the reception desk.';
     case 'Cancelled':
+      if (token.queueStatus === 'Closed') {
+        return 'The queue has closed for today.';
+      }
       return 'This token is no longer active.';
     case 'NoShow':
       return 'The queue has closed for today.';
@@ -29,6 +34,8 @@ export default function TokenPage() {
 
   const [token, setToken] = useState<TokenInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { changeCount, liveStatus } = useQueueUpdates(token?.queueId);
+  const shouldPoll = liveStatus === 'reconnecting' || liveStatus === 'offline';
 
   useEffect(() => {
     if (!tokenId) {
@@ -54,13 +61,13 @@ export default function TokenPage() {
     }
 
     refresh();
-    const timer = setInterval(refresh, REFRESH_EVERY_MS);
+    const timer = shouldPoll ? setInterval(refresh, REFRESH_EVERY_MS) : undefined;
 
     return () => {
       stopped = true;
       clearInterval(timer);
     };
-  }, [tokenId]);
+  }, [tokenId, changeCount, shouldPoll]);
 
   async function handleLeave() {
     if (!token || !window.confirm('Leave the queue? You will lose your place.')) {
@@ -84,6 +91,7 @@ export default function TokenPage() {
 
   return (
     <main className="page">
+      <ConnectionNotice liveStatus={liveStatus} />
       <p className="muted">{token.queueName}</p>
       <p className="token-number" aria-label={`Your token number is ${token.displayNumber}`}>
         {token.displayNumber}
