@@ -12,9 +12,11 @@ import {
   skipToken,
   type Dashboard,
 } from '../api';
+import ConnectionNotice from '../components/ConnectionNotice';
 import NowServing from '../components/NowServing';
 import TokenList from '../components/TokenList';
 import { loadCounterName, saveCounterName } from '../counterStorage';
+import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 5_000;
 
@@ -29,6 +31,8 @@ export default function CounterPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [reloadCount, setReloadCount] = useState(0);
+  const { changeCount, liveStatus } = useQueueUpdates(queueId);
+  const shouldPoll = liveStatus === 'reconnecting' || liveStatus === 'offline';
 
   useEffect(() => {
     if (!queueId || !counterName) {
@@ -55,13 +59,13 @@ export default function CounterPage() {
     }
 
     refresh();
-    const timer = setInterval(refresh, REFRESH_EVERY_MS);
+    const timer = shouldPoll ? setInterval(refresh, REFRESH_EVERY_MS) : undefined;
 
     return () => {
       stopped = true;
       clearInterval(timer);
     };
-  }, [queueId, counterName, reloadCount]);
+  }, [queueId, counterName, reloadCount, changeCount, shouldPoll]);
 
   async function runAction(action: () => Promise<unknown>) {
     setBusy(true);
@@ -163,6 +167,7 @@ export default function CounterPage() {
 
   return (
     <main className="page page-wide">
+      <ConnectionNotice liveStatus={liveStatus} />
       <header className="counter-header">
         <h1>{dashboard.queue.name}</h1>
         <p className="muted">
