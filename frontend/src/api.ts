@@ -78,6 +78,7 @@ export interface QueueOverview {
   name: string;
   prefix: string;
   averageServiceMinutes: number;
+  dailyTokenLimit: number | null;
   status: QueueStatus;
   peopleWaiting: number;
   issuedToday: number;
@@ -117,6 +118,7 @@ export interface NewQueue {
   name: string;
   prefix: string;
   averageServiceMinutes: number;
+  dailyTokenLimit: number | null;
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -245,11 +247,16 @@ export function updateBusiness(profile: BusinessProfile): Promise<BusinessProfil
   });
 }
 
-export function updateQueue(queueId: string, name: string, averageServiceMinutes: number): Promise<QueueOverview> {
+export function updateQueue(
+  queueId: string,
+  name: string,
+  averageServiceMinutes: number,
+  dailyTokenLimit: number | null,
+): Promise<QueueOverview> {
   return request<QueueOverview>(`/api/queues/${queueId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, averageServiceMinutes }),
+    body: JSON.stringify({ name, averageServiceMinutes, dailyTokenLimit }),
   });
 }
 

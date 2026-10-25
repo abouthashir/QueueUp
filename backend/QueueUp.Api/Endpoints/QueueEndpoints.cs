@@ -37,7 +37,8 @@ public static class QueueEndpoints
                 BusinessId = user.GetBusinessId(),
                 Name = request.Name.Trim(),
                 Prefix = char.ToUpperInvariant(request.Prefix),
-                AverageServiceMinutes = request.AverageServiceMinutes
+                AverageServiceMinutes = request.AverageServiceMinutes,
+                DailyTokenLimit = request.DailyTokenLimit
             };
 
             store.AddQueue(queue);
@@ -64,6 +65,7 @@ public static class QueueEndpoints
 
             queue.Name = request.Name.Trim();
             queue.AverageServiceMinutes = request.AverageServiceMinutes;
+            queue.DailyTokenLimit = request.DailyTokenLimit;
             await store.SaveChangesAsync();
             await notifier.QueueChangedAsync(queueId);
 

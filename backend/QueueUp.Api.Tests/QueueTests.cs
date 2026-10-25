@@ -403,4 +403,32 @@ public class QueueTests
         Assert.Equal("Counter 1 is still serving A-002. Mark it served or skipped first.", exception.Message);
         Assert.Equal(TokenStatus.Skipped, anu.Status);
     }
+
+
+    // Daily token limit: the owner can cap how many tokens a queue gives out each day
+
+    [Fact]
+    public void Join_WhenTodaysLimitIsReached_Throws()
+    {
+        var queue = CreateOpenQueue();
+        queue.DailyTokenLimit = 2;
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => queue.Join("Meera", Morning));
+
+        Assert.Equal("Queue General OPD has given out all 2 tokens for today. Please come back tomorrow.", exception.Message);
+    }
+
+    [Fact]
+    public void Join_LimitStartsAgainTheNextDay()
+    {
+        var queue = CreateOpenQueue();
+        queue.DailyTokenLimit = 1;
+        queue.Join("Anu", Morning);
+
+        var tomorrow = queue.Join("Rahul", Morning.AddDays(1));
+
+        Assert.Equal(1, tomorrow.Number);
+    }
 }

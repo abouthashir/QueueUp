@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
-import { createQueue, getMyQueues, type QueueOverview } from '../api';;
+import { createQueue, getMyQueues, type QueueOverview } from '../api';
 import { loadAuth } from '../authStorage';
 import StaffHeader from '../components/StaffHeader';
+import { parseDailyLimit } from '../limits';
 
 export default function QueuesPage() {
   const isOwner = loadAuth()?.role === 'Owner';
@@ -13,6 +14,7 @@ export default function QueuesPage() {
   const [name, setName] = useState('');
   const [prefix, setPrefix] = useState('A');
   const [minutes, setMinutes] = useState('5');
+  const [dailyLimit, setDailyLimit] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -46,7 +48,12 @@ export default function QueuesPage() {
     setError(null);
 
     try {
-      await createQueue({ name, prefix, averageServiceMinutes: Number(minutes) });
+      await createQueue({
+        name,
+        prefix,
+        averageServiceMinutes: Number(minutes),
+        dailyTokenLimit: parseDailyLimit(dailyLimit),
+      });
       setName('');
       setReloadCount((count) => count + 1);
     } catch (e) {
@@ -135,6 +142,17 @@ export default function QueuesPage() {
               max={120}
               value={minutes}
               onChange={(event) => setMinutes(event.target.value)}
+            />
+
+            <label htmlFor="queue-limit">Daily token limit (optional)</label>
+            <input
+              id="queue-limit"
+              type="number"
+              min={1}
+              max={1000}
+              placeholder="No limit"
+              value={dailyLimit}
+              onChange={(event) => setDailyLimit(event.target.value)}
             />
 
             <button type="submit" disabled={busy}>

@@ -9,6 +9,7 @@ public class Queue
     public required string Name { get; set; }
     public char Prefix { get; init; }
     public int AverageServiceMinutes { get; set; }
+    public int? DailyTokenLimit { get; set; }
     public QueueStatus Status { get; private set; }
 
     public void Open()
@@ -54,6 +55,13 @@ public class Queue
         }
 
         DateOnly today = ServiceDay.For(now);
+
+
+        if (DailyTokenLimit != null && CountIssuedToday(now) >= DailyTokenLimit)
+        {
+            throw new InvalidOperationException(
+                $"Queue {Name} has given out all {DailyTokenLimit} tokens for today. Please come back tomorrow.");
+        }
 
         var token = new Token
         {

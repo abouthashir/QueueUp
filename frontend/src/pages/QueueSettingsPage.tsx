@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router';
 import { getMyQueues, updateQueue, type QueueOverview } from '../api';
 import StaffHeader from '../components/StaffHeader';
+import { parseDailyLimit } from '../limits';
 
 export default function QueueSettingsPage() {
   const { queueId } = useParams();
@@ -9,6 +10,7 @@ export default function QueueSettingsPage() {
   const [queue, setQueue] = useState<QueueOverview | null>(null);
   const [name, setName] = useState('');
   const [minutes, setMinutes] = useState('');
+  const [dailyLimit, setDailyLimit] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -32,6 +34,7 @@ export default function QueueSettingsPage() {
         setQueue(found);
         setName(found.name);
         setMinutes(String(found.averageServiceMinutes));
+        setDailyLimit(found.dailyTokenLimit === null ? '' : String(found.dailyTokenLimit));
       } catch (e) {
         if (!stopped) {
           setError((e as Error).message);
@@ -58,7 +61,7 @@ export default function QueueSettingsPage() {
     setNotice(null);
 
     try {
-      setQueue(await updateQueue(queue.id, name, Number(minutes)));
+      setQueue(await updateQueue(queue.id, name, Number(minutes), parseDailyLimit(dailyLimit)));
       setNotice('Saved.');
     } catch (e) {
       setError((e as Error).message);
@@ -100,6 +103,17 @@ export default function QueueSettingsPage() {
               max={120}
               value={minutes}
               onChange={(event) => setMinutes(event.target.value)}
+            />
+
+            <label htmlFor="queue-limit">Daily token limit (optional)</label>
+            <input
+              id="queue-limit"
+              type="number"
+              min={1}
+              max={1000}
+              placeholder="No limit"
+              value={dailyLimit}
+              onChange={(event) => setDailyLimit(event.target.value)}
             />
 
             <button type="submit" disabled={busy}>

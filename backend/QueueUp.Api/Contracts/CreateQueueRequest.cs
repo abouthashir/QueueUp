@@ -1,6 +1,6 @@
 namespace QueueUp.Api.Contracts;
 
-public record CreateQueueRequest(string Name, char Prefix, int AverageServiceMinutes)
+public record CreateQueueRequest(string Name, char Prefix, int AverageServiceMinutes, int? DailyTokenLimit = null)
 {
     public string? FindProblem()
     {
@@ -17,6 +17,11 @@ public record CreateQueueRequest(string Name, char Prefix, int AverageServiceMin
         if (AverageServiceMinutes < 1 || AverageServiceMinutes > 120)
         {
             return "The average service time must be between 1 and 120 minutes.";
+        }
+
+        if (DailyTokenLimit is < 1 or > 1000)
+        {
+            return "The daily token limit must be between 1 and 1000, or left empty for no limit.";
         }
 
         return null;

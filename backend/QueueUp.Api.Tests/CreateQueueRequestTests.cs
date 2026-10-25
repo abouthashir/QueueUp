@@ -25,4 +25,13 @@ public class CreateQueueRequestTests
 
         Assert.Equal("The average service time must be between 1 and 120 minutes.", request.FindProblem());
     }
+
+
+    [Fact]
+    public void FindProblem_DailyLimitOfZero_IsRejected()
+    {
+        var request = new CreateQueueRequest("Pharmacy", 'B', 4, DailyTokenLimit: 0);
+
+        Assert.Equal("The daily token limit must be between 1 and 1000, or left empty for no limit.", request.FindProblem());
+    }
 }
