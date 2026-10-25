@@ -26,7 +26,6 @@ public class CreateQueueRequestTests
         Assert.Equal("The average service time must be between 1 and 120 minutes.", request.FindProblem());
     }
 
-
     [Fact]
     public void FindProblem_DailyLimitOfZero_IsRejected()
     {

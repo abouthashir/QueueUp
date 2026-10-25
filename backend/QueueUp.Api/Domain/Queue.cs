@@ -56,7 +56,6 @@ public class Queue
 
         DateOnly today = ServiceDay.For(now);
 
-
         if (DailyTokenLimit != null && CountIssuedToday(now) >= DailyTokenLimit)
         {
             throw new InvalidOperationException(

@@ -404,7 +404,6 @@ public class QueueTests
         Assert.Equal(TokenStatus.Skipped, anu.Status);
     }
 
-
     // Daily token limit: the owner can cap how many tokens a queue gives out each day
 
     [Fact]

@@ -75,7 +75,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(AuthPolicies.OwnerOnly, policy => policy.RequireRole(nameof(UserRole.Owner)));
 
 RateLimitOptions limits = builder.Configuration.GetSection(RateLimitOptions.SectionName).Get<RateLimitOptions>()
-?? new RateLimitOptions();
+    ?? new RateLimitOptions();
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -128,3 +128,6 @@ app.MapTokenEndpoints();
 app.MapHub<QueueHub>("/hubs/queue");
 
 app.Run();
+
+
+public partial class Program;
