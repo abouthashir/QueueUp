@@ -292,3 +292,53 @@ select {
   font-weight: 700;
   color: var(--color-primary-dark);
 }
+
+.poster {
+  max-width: 180mm;
+  margin: 0 auto;
+  padding: 24px 16px;
+  text-align: center;
+  background: #fff;
+}
+
+.poster-business {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.poster-queue {
+  margin: 8px 0 24px;
+  font-size: 3rem;
+}
+
+.poster-call {
+  margin: 24px 0 8px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+
+.poster-steps {
+  font-size: 1.25rem;
+}
+
+.poster-url {
+  color: var(--color-muted);
+  word-break: break-all;
+}
+
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+  }
+}

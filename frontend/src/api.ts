@@ -26,6 +26,7 @@ export interface TokenInfo {
   counterName: string | null;
   peopleAhead: number;
   estimatedWaitMinutes: number;
+  nowServing: string[];
 }
 
 export interface TokenSummary {
@@ -96,6 +97,20 @@ export interface NewStaff {
   email: string;
   password: string;
   counterName: string;
+}
+
+export interface CounterServing {
+  counterName: string;
+  displayNumber: string;
+}
+
+export interface DisplayInfo {
+  businessName: string;
+  queueName: string;
+  status: QueueStatus;
+  nowServing: CounterServing[];
+  next: string[];
+  peopleWaiting: number;
 }
 
 export interface NewQueue {
@@ -260,4 +275,8 @@ export function updateStaff(staffId: string, name: string, counterName: string):
 
 export function removeStaff(staffId: string): Promise<null> {
   return request<null>(`/api/staff/${staffId}`, { method: 'DELETE' });
+}
+
+export function getDisplay(queueId: string): Promise<DisplayInfo> {
+  return request<DisplayInfo>(`/api/queues/${queueId}/display`);
 }

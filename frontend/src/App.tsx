@@ -3,6 +3,7 @@ import RequireLogin from './components/RequireLogin';
 import CounterPage from './pages/CounterPage';
 import JoinPage from './pages/JoinPage';
 import LoginPage from './pages/LoginPage';
+import PosterPage from './pages/PosterPage';
 import QueueSettingsPage from './pages/QueueSettingsPage';
 import QueuesPage from './pages/QueuesPage';
 import SignupPage from './pages/SignupPage';
@@ -38,6 +39,14 @@ export default function App() {
         element={
           <RequireLogin ownerOnly>
             <QueueSettingsPage />
+          </RequireLogin>
+        }
+      />
+      <Route
+        path="/queues/:queueId/poster"
+        element={
+          <RequireLogin ownerOnly>
+            <PosterPage />
           </RequireLogin>
         }
       />

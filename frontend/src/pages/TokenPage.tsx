@@ -135,6 +135,11 @@ export default function TokenPage() {
         {describe(token)}
       </p>
 
+
+      {token.status === 'Waiting' && token.nowServing.length > 0 && (
+        <p className="muted">Now serving {token.nowServing.join(', ')}</p>
+      )}
+
       {token.status === 'Waiting' && !alertsOn && (
         <button type="button" onClick={handleEnableAlerts}>
           Turn on alerts
