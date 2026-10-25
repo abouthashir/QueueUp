@@ -12,6 +12,7 @@ using System.Security.Claims;
 using QueueUp.Api.Background;
 using System.Threading.RateLimiting;
 using QueueUp.Api.Security;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,7 +104,22 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 });
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+    using IServiceScope scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<QueueUpDbContext>().Database.MigrateAsync();
+}
+
+app.UseForwardedHeaders();
 
 app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 {
