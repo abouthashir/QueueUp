@@ -102,6 +102,12 @@ jobs:
       - run: npm ci
         working-directory: frontend
 
+      - name: Check the API address is set
+        if: vars.API_URL == ''
+        run: |
+          echo "::error::Set the API_URL repository variable before deploying."
+          exit 1
+
       - run: npm run build
         working-directory: frontend
         env:
