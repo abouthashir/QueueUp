@@ -6,9 +6,9 @@ public class Queue
 
     public Guid Id { get; init; }
     public Guid BusinessId { get; init; }
-    public required string Name { get; init; }
+    public required string Name { get; set; }
     public char Prefix { get; init; }
-    public int AverageServiceMinutes { get; init; }
+    public int AverageServiceMinutes { get; set; }
     public QueueStatus Status { get; private set; }
 
     public void Open()
@@ -75,12 +75,21 @@ public class Queue
         return TokensToday(TokenStatus.Waiting, now).Count;
     }
 
-    public IReadOnlyList<Token> TokensToday(TokenStatus status, DateTimeOffset now)
+    public int CountIssuedToday(DateTimeOffset now)
     {
         DateOnly today = ServiceDay.For(now);
+        return _tokens.Count(token => token.ServiceDate == today);
+    }
 
+    public IReadOnlyList<Token> TokensToday(TokenStatus status, DateTimeOffset now)
+    {
+        return TokensOn(ServiceDay.For(now), status);
+    }
+
+    public IReadOnlyList<Token> TokensOn(DateOnly day, TokenStatus status)
+    {
         return _tokens
-            .Where(token => token.ServiceDate == today && token.Status == status)
+            .Where(token => token.ServiceDate == day && token.Status == status)
             .OrderBy(token => token.Number)
             .ToList();
     }

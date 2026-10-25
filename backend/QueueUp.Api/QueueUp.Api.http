@@ -259,3 +259,33 @@ Authorization: Bearer {{staffToken}}
 
 ### 37. The join page's data now includes the business (public)
 GET {{baseUrl}}/api/queues/{{queueId}}
+
+### 38. Owner renames the queue and changes its average time
+PUT {{baseUrl}}/api/queues/{{queueId}}
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "General OPD (Ground floor)",
+  "averageServiceMinutes": 6
+}
+
+### 39. Settings with zero minutes (expect 400)
+PUT {{baseUrl}}/api/queues/{{queueId}}
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "General OPD",
+  "averageServiceMinutes": 0
+}
+
+### 40. Staff try to change settings (expect 403)
+PUT {{baseUrl}}/api/queues/{{queueId}}
+Authorization: Bearer {{staffToken}}
+Content-Type: application/json
+
+{
+  "name": "Renamed by staff",
+  "averageServiceMinutes": 3
+}

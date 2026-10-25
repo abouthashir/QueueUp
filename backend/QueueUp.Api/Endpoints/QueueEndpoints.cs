@@ -18,7 +18,7 @@ public static class QueueEndpoints
             List<Queue> queues = await store.GetQueuesForBusinessAsync(user.GetBusinessId());
             DateTimeOffset now = clock.GetUtcNow();
 
-            return queues.Select(queue => QueueResponse.From(queue, now)).ToList();
+            return queues.Select(queue => QueueOverviewResponse.From(queue, now)).ToList();
         }).RequireAuthorization();
 
         app.MapPost("/api/queues", async (CreateQueueRequest request, ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>
@@ -43,6 +43,30 @@ public static class QueueEndpoints
             await store.SaveChangesAsync();
 
             return Results.Created($"/api/queues/{queue.Id}", QueueResponse.From(queue, clock.GetUtcNow()));
+        }).RequireAuthorization(AuthPolicies.OwnerOnly);
+
+        app.MapPut("/api/queues/{queueId:guid}", async (Guid queueId, UpdateQueueRequest request, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
+        {
+            string? problem = request.FindProblem();
+
+            if (problem != null)
+            {
+                return Results.BadRequest(new { message = problem });
+            }
+
+            Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());
+
+            if (queue == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            queue.Name = request.Name.Trim();
+            queue.AverageServiceMinutes = request.AverageServiceMinutes;
+            await store.SaveChangesAsync();
+            await notifier.QueueChangedAsync(queueId);
+
+            return Results.Ok(QueueOverviewResponse.From(queue, clock.GetUtcNow()));
         }).RequireAuthorization(AuthPolicies.OwnerOnly);
 
         app.MapGet("/api/queues/{queueId:guid}", async (Guid queueId, QueueStore store, TimeProvider clock) =>
