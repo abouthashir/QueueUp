@@ -21,6 +21,9 @@ public class QueueUpDbContext : DbContext
         {
             business.Property(b => b.Id).ValueGeneratedNever();
             business.Property(b => b.Name).HasMaxLength(100);
+            business.Property(b => b.Type).HasConversion<string>().HasMaxLength(20);
+            business.Property(b => b.Address).HasMaxLength(200);
+            business.Property(b => b.OpeningHours).HasMaxLength(100);
 
             business.HasData(new Business { Id = QueueStore.DemoBusinessId, Name = "Demo Clinic" });
         });

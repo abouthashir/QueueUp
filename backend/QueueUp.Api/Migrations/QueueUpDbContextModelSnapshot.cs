@@ -27,10 +27,25 @@ namespace QueueUp.Api.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("OpeningHours")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -40,7 +55,10 @@ namespace QueueUp.Api.Migrations
                         new
                         {
                             Id = new Guid("5e0b6a3c-8d2f-4c71-9a4e-0f3d2b1c7e65"),
-                            Name = "Demo Clinic"
+                            Address = "",
+                            Name = "Demo Clinic",
+                            OpeningHours = "",
+                            Type = "Other"
                         });
                 });
 
