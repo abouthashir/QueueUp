@@ -226,3 +226,36 @@ Authorization: Bearer {{staffToken}}
 
 ### 32. SignalR handshake (Lesson 11, public)
 POST {{baseUrl}}/hubs/queue/negotiate?negotiateVersion=1
+
+### 33. Owner reads the business profile (Lesson 13)
+GET {{baseUrl}}/api/business
+Authorization: Bearer {{ownerToken}}
+
+### 34. Owner updates the business profile
+PUT {{baseUrl}}/api/business
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Sunrise Clinic",
+  "type": "Clinic",
+  "address": "Main Road, Kalpetta",
+  "openingHours": "Mon to Sat, 9 am to 5 pm"
+}
+
+### 35. Update with a made-up type number (expect 400)
+PUT {{baseUrl}}/api/business
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Sunrise Clinic",
+  "type": 99
+}
+
+### 36. Staff try to read the profile (expect 403)
+GET {{baseUrl}}/api/business
+Authorization: Bearer {{staffToken}}
+
+### 37. The join page's data now includes the business (public)
+GET {{baseUrl}}/api/queues/{{queueId}}

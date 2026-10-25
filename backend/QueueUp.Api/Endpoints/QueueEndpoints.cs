@@ -54,7 +54,16 @@ public static class QueueEndpoints
                 return ApiErrors.QueueNotFound(queueId);
             }
 
-            return Results.Ok(QueueResponse.From(queue, clock.GetUtcNow()));
+            Business? business = await store.FindBusinessAsync(queue.BusinessId);
+
+            if (business == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            return Results.Ok(new JoinInfoResponse(
+                QueueResponse.From(queue, clock.GetUtcNow()),
+                BusinessProfileResponse.From(business)));
         });
 
         app.MapGet("/api/queues/{queueId:guid}/dashboard", async (Guid queueId, ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>

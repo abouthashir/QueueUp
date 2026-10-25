@@ -75,6 +75,7 @@ app.MapGet("/", () => "QueueUp API is running");
 app.MapGet("/api/health", () => new { status = "ok", service = "QueueUp API" });
 
 app.MapAuthEndpoints();
+app.MapBusinessEndpoints();
 app.MapQueueEndpoints();
 app.MapStaffEndpoints();
 app.MapTokenEndpoints();

@@ -36,4 +36,9 @@ public static class ApiErrors
     {
         return Results.Json(new { message = "Email or password is incorrect." }, statusCode: StatusCodes.Status401Unauthorized);
     }
+
+    public static IResult BusinessNotFound()
+    {
+        return Results.NotFound(new { message = "Your business was not found." });
+    }
 }
