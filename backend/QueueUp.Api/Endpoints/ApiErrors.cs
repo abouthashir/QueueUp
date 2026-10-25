@@ -41,4 +41,9 @@ public static class ApiErrors
     {
         return Results.NotFound(new { message = "Your business was not found." });
     }
+
+    public static IResult StaffNotFound(Guid staffId)
+    {
+        return Results.NotFound(new { message = $"Staff member {staffId} was not found." });
+    }
 }

@@ -8,6 +8,7 @@ using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
 using QueueUp.Api.Endpoints;
 using QueueUp.Api.Hubs;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = jwt.CreateSigningKey(),
             NameClaimType = AuthClaims.Name,
             RoleClaimType = AuthClaims.Role
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                QueueStore store = context.HttpContext.RequestServices.GetRequiredService<QueueStore>();
+                string? userId = context.Principal?.FindFirstValue(AuthClaims.UserId);
+
+                if (!Guid.TryParse(userId, out Guid id) || !await store.UserExistsAsync(id))
+                {
+                    context.Fail("This account no longer exists.");
+                }
+            }
         };
     });
 

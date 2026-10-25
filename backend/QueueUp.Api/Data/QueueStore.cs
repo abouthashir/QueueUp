@@ -49,6 +49,30 @@ public class QueueStore
         return await _db.Users.FirstOrDefaultAsync(user => user.Email == email);
     }
 
+    public async Task<bool> UserExistsAsync(Guid userId)
+    {
+        return await _db.Users.AnyAsync(user => user.Id == userId);
+    }
+
+    public async Task<List<User>> GetStaffAsync(Guid businessId)
+    {
+        return await _db.Users
+            .Where(user => user.BusinessId == businessId && user.Role == UserRole.Staff)
+            .OrderBy(user => user.Name)
+            .ToListAsync();
+    }
+
+    public async Task<User?> FindStaffAsync(Guid userId, Guid businessId)
+    {
+        return await _db.Users.FirstOrDefaultAsync(user =>
+            user.Id == userId && user.BusinessId == businessId && user.Role == UserRole.Staff);
+    }
+
+    public void RemoveUser(User user)
+    {
+        _db.Users.Remove(user);
+    }
+
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _db.Users.AnyAsync(user => user.Email == email);

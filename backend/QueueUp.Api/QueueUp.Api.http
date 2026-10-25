@@ -289,3 +289,67 @@ Content-Type: application/json
   "name": "Renamed by staff",
   "averageServiceMinutes": 3
 }
+
+### 41. Owner lists staff
+# @name staffList
+GET {{baseUrl}}/api/staff
+Authorization: Bearer {{ownerToken}}
+
+### 42. Owner moves Reshma to Counter 3
+PUT {{baseUrl}}/api/staff/{{staffList.response.body.$[0].id}}
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Reshma",
+  "counterName": "Counter 3"
+}
+
+### 43. Staff try to list staff (expect 403)
+GET {{baseUrl}}/api/staff
+Authorization: Bearer {{staffToken}}
+
+### 44. City Bank tries to edit Sunrise's staff (expect 404)
+PUT {{baseUrl}}/api/staff/{{staffList.response.body.$[0].id}}
+Authorization: Bearer {{bankToken}}
+Content-Type: application/json
+
+{
+  "name": "Hacked",
+  "counterName": "X"
+}
+
+### 45. Owner adds a temporary staff member
+# @name tempStaff
+POST {{baseUrl}}/api/staff
+Authorization: Bearer {{ownerToken}}
+Content-Type: application/json
+
+{
+  "name": "Temp",
+  "email": "temp@sunrise.test",
+  "password": "test-password-6",
+  "counterName": "Counter 9"
+}
+
+### 46. Temp logs in
+# @name tempLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "temp@sunrise.test",
+  "password": "test-password-6"
+}
+
+### 47. Temp's pass works
+GET {{baseUrl}}/api/queues
+Authorization: Bearer {{tempLogin.response.body.$.token}}
+
+### 48. Owner removes Temp (expect 204)
+DELETE {{baseUrl}}/api/staff/{{tempStaff.response.body.$.id}}
+Authorization: Bearer {{ownerToken}}
+
+### 49. Temp's old pass right after removal (expect 401)
+GET {{baseUrl}}/api/queues
+Authorization: Bearer {{tempLogin.response.body.$.token}}
