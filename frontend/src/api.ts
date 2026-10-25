@@ -4,6 +4,7 @@ export const API_URL: string = import.meta.env.VITE_API_URL;
 
 export type QueueStatus = 'Closed' | 'Open' | 'Paused';
 export type UserRole = 'Owner' | 'Staff';
+export type BusinessType = 'Clinic' | 'Bank' | 'Salon' | 'Other';
 export type TokenStatus = 'Waiting' | 'Called' | 'Served' | 'Skipped' | 'Cancelled' | 'NoShow';
 
 export interface QueueInfo {
@@ -59,6 +60,18 @@ export interface SignupDetails {
   counterName: string;
 }
 
+export interface BusinessProfile {
+  name: string;
+  type: BusinessType;
+  address: string;
+  openingHours: string;
+}
+
+export interface JoinInfo {
+  queue: QueueInfo;
+  business: BusinessProfile;
+}
+
 export interface NewQueue {
   name: string;
   prefix: string;
@@ -99,8 +112,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-export function getQueue(queueId: string): Promise<QueueInfo> {
-  return request<QueueInfo>(`/api/queues/${queueId}`);
+export function getJoinInfo(queueId: string): Promise<JoinInfo> {
+  return request<JoinInfo>(`/api/queues/${queueId}`);
 }
 
 export function joinQueue(queueId: string, customerName: string): Promise<TokenInfo> {
@@ -176,5 +189,17 @@ export function createQueue(queue: NewQueue): Promise<QueueInfo> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(queue),
+  });
+}
+
+export function getBusiness(): Promise<BusinessProfile> {
+  return request<BusinessProfile>('/api/business');
+}
+
+export function updateBusiness(profile: BusinessProfile): Promise<BusinessProfile> {
+  return request<BusinessProfile>('/api/business', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile),
   });
 }

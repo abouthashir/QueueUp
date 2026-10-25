@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import QueuesPage from './pages/QueuesPage';
 import SignupPage from './pages/SignupPage';
 import TokenPage from './pages/TokenPage';
+import BusinessPage from './pages/BusinessPage';
 
 export default function App() {
   return (
@@ -27,6 +28,14 @@ export default function App() {
         element={
           <RequireLogin>
             <CounterPage />
+          </RequireLogin>
+        }
+      />
+      <Route
+        path="/business"
+        element={
+          <RequireLogin ownerOnly>
+            <BusinessPage />
           </RequireLogin>
         }
       />

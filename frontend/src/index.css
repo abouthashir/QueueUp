@@ -260,3 +260,35 @@ button.link {
   background: transparent;
   border: 2px solid var(--color-primary);
 }
+
+select {
+  font-size: 16px;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #9aa5b1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.owner-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.owner-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-primary-dark);
+}
+
+.owner-nav a.active {
+  font-weight: 700;
+  text-decoration-thickness: 3px;
+}
+
+.business-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}

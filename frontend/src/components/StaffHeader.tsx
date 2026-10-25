@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 import { forgetAuth, loadAuth } from '../authStorage';
 
 export default function StaffHeader() {
@@ -20,6 +20,13 @@ export default function StaffHeader() {
       <span className="muted">
         {auth.name} · {auth.counterName}
       </span>
+      {auth.role === 'Owner' && (
+        <nav className="owner-nav" aria-label="Owner tools">
+          <NavLink to="/dashboard">Queues</NavLink>
+          <NavLink to="/staff">Staff</NavLink>
+          <NavLink to="/business">Business</NavLink>
+        </nav>
+      )}
       <button type="button" className="link" onClick={handleLogout}>
         Log out
       </button>

@@ -1,13 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getQueue, getToken, joinQueue, type QueueInfo } from '../api';
+import { getJoinInfo, getToken, joinQueue, type JoinInfo } from '../api';
 import { forgetTokenId, loadTokenId, saveTokenId } from '../tokenStorage';
 
 export default function JoinPage() {
   const { queueId } = useParams();
   const navigate = useNavigate();
 
-  const [queue, setQueue] = useState<QueueInfo | null>(null);
+  const [info, setInfo] = useState<JoinInfo | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
@@ -34,7 +34,7 @@ export default function JoinPage() {
       }
 
       try {
-        setQueue(await getQueue(id));
+        setInfo(await getJoinInfo(id));
       } catch (e) {
         setError((e as Error).message);
       }
@@ -63,7 +63,7 @@ export default function JoinPage() {
     }
   }
 
-  if (error && !queue) {
+  if (error && !info) {
     return (
       <main className="page">
         <p className="error" role="alert">{error}</p>
@@ -71,7 +71,7 @@ export default function JoinPage() {
     );
   }
 
-  if (!queue) {
+  if (!info) {
     return (
       <main className="page">
         <p className="muted">Loading…</p>
@@ -79,9 +79,14 @@ export default function JoinPage() {
     );
   }
 
+  const { queue, business } = info;
+
   return (
     <main className="page">
+      <p className="business-name">{business.name}</p>
       <h1>{queue.name}</h1>
+      {business.address && <p className="muted">{business.address}</p>}
+      {business.openingHours && <p className="muted">Open {business.openingHours}</p>}
 
       {queue.status === 'Open' && (
         <>
