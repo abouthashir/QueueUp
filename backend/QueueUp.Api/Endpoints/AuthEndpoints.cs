@@ -3,6 +3,7 @@ using QueueUp.Api.Auth;
 using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
+using QueueUp.Api.Security;
 
 namespace QueueUp.Api.Endpoints;
 
@@ -48,7 +49,7 @@ public static class AuthEndpoints
             }
 
             return Results.Ok(issuer.Issue(owner, business, clock.GetUtcNow()));
-        });
+        }).RequireRateLimiting(RateLimitOptions.AuthPolicy);
 
         app.MapPost("/api/auth/login", async (LoginRequest request, QueueStore store, IPasswordHasher<User> hasher, TokenIssuer issuer, TimeProvider clock) =>
         {
@@ -72,6 +73,6 @@ public static class AuthEndpoints
             }
 
             return Results.Ok(issuer.Issue(user, business, clock.GetUtcNow()));
-        });
+        }).RequireRateLimiting(RateLimitOptions.AuthPolicy);
     }
 }

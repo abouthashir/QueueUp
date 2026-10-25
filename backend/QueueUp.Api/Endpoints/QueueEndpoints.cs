@@ -4,6 +4,7 @@ using QueueUp.Api.Contracts;
 using QueueUp.Api.Data;
 using QueueUp.Api.Domain;
 using QueueUp.Api.Hubs;
+using QueueUp.Api.Security;
 
 namespace QueueUp.Api.Endpoints;
 
@@ -151,7 +152,7 @@ public static class QueueEndpoints
             }
 
             return ApiErrors.Busy();
-        });
+        }).RequireRateLimiting(RateLimitOptions.JoinPolicy);
 
         app.MapPost("/api/queues/{queueId:guid}/pause", async (Guid queueId, ClaimsPrincipal user, QueueStore store, QueueNotifier notifier, TimeProvider clock) =>
         {

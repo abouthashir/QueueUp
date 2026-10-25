@@ -10,6 +10,8 @@ using QueueUp.Api.Endpoints;
 using QueueUp.Api.Hubs;
 using System.Security.Claims;
 using QueueUp.Api.Background;
+using System.Threading.RateLimiting;
+using QueueUp.Api.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +74,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(AuthPolicies.OwnerOnly, policy => policy.RequireRole(nameof(UserRole.Owner)));
 
+RateLimitOptions limits = builder.Configuration.GetSection(RateLimitOptions.SectionName).Get<RateLimitOptions>()
+?? new RateLimitOptions();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { message = "Too many attempts. Please wait a few minutes and try again." }, cancellationToken);
+    };
+
+    options.AddPolicy(RateLimitOptions.AuthPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
+        RateLimitOptions.ClientKey(context),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = limits.AuthAttemptsPerFiveMinutes, Window = TimeSpan.FromMinutes(5) }));
+
+    options.AddPolicy(RateLimitOptions.JoinPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
+        RateLimitOptions.ClientKey(context),
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = limits.JoinsPerMinute, Window = TimeSpan.FromMinutes(1) }));
+});
+
 string[] allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(options =>
@@ -91,6 +114,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapGet("/", () => "QueueUp API is running");
 
