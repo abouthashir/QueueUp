@@ -91,4 +91,47 @@ public class QueueUpApiTests : IClassFixture<QueueUpApiFactory>
         Assert.Null(await db.Tokens.Where(token => token.Id == old.Id).Select(token => token.CustomerName).SingleAsync());
         Assert.Equal("Recent visit", await db.Tokens.Where(token => token.Id == recent.Id).Select(token => token.CustomerName).SingleAsync());
     }
+
+
+    [Fact]
+    public async Task TwoCountersCallingAtTheSameMoment_NeverGetTheSameToken()
+    {
+        HttpClient owner = await ApiHelpers.SignUpOwnerAsync(_factory, "Sunrise Clinic", "Counter 1");
+        HttpClient staff = await ApiHelpers.AddStaffAsync(_factory, owner, "Counter 2");
+        Guid queueId = await ApiHelpers.CreateOpenQueueAsync(owner);
+        HttpClient customer = _factory.CreateClient();
+        for (int i = 0; i < 10; i++)
+        {
+            await ApiHelpers.JoinAsync(customer, queueId, null);
+        }
+
+        for (int round = 0; round < 5; round++)
+        {
+            HttpResponseMessage[] calls = await Task.WhenAll(
+                owner.PostAsync($"/api/queues/{queueId}/call-next", null),
+                staff.PostAsync($"/api/queues/{queueId}/call-next", null));
+
+            TokenResponse first = await calls[0].ReadAsync<TokenResponse>();
+            TokenResponse second = await calls[1].ReadAsync<TokenResponse>();
+            Assert.NotEqual(first.Id, second.Id);
+
+            await owner.PostAsync($"/api/tokens/{first.Id}/serve", null);
+            await staff.PostAsync($"/api/tokens/{second.Id}/serve", null);
+        }
+    }
+
+    [Fact]
+    public async Task ManyPeopleJoiningAtOnce_GetUniqueNumbers()
+    {
+        HttpClient owner = await ApiHelpers.SignUpOwnerAsync(_factory, "Sunrise Clinic");
+        Guid queueId = await ApiHelpers.CreateOpenQueueAsync(owner);
+        HttpClient customer = _factory.CreateClient();
+
+        TokenResponse[] tokens = await Task.WhenAll(
+            Enumerable.Range(1, 8).Select(_ => ApiHelpers.JoinAsync(customer, queueId, null)));
+
+        Assert.Equal(
+            Enumerable.Range(1, 8).Select(number => $"A-{number:D3}"),
+            tokens.Select(token => token.DisplayNumber).Order());
+    }
 }

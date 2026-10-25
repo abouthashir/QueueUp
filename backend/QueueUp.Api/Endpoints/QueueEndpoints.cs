@@ -10,7 +10,7 @@ namespace QueueUp.Api.Endpoints;
 
 public static class QueueEndpoints
 {
-    private const int MaxAttempts = 5;
+    private const int MaxAttempts = 10;
 
     public static void MapQueueEndpoints(this WebApplication app)
     {
@@ -151,6 +151,7 @@ public static class QueueEndpoints
                     await notifier.QueueChangedAsync(queueId);
                     return Results.Created($"/api/tokens/{token.Id}", TokenResponse.From(queue, token));
                 }
+                await WaitBeforeRetryingAsync(attempt);
             }
 
             return ApiErrors.Busy();
@@ -242,9 +243,17 @@ public static class QueueEndpoints
                     await notifier.QueueChangedAsync(queueId);
                     return Results.Ok(TokenResponse.From(queue, token));
                 }
+                await WaitBeforeRetryingAsync(attempt);
             }
 
             return ApiErrors.Busy();
         }).RequireAuthorization();
+
+    }
+
+    private static Task WaitBeforeRetryingAsync(int attempt)
+    {
+        // A short random pause, growing with each attempt, so requests that collided don't all retry at the same moment.
+        return Task.Delay(Random.Shared.Next(10, 50) * attempt);
     }
 }
