@@ -1,0 +1,4 @@
+**/bin/
+**/obj/
+QueueUp.Api.Tests/
+**/*.http
