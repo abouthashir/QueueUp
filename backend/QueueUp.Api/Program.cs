@@ -9,6 +9,7 @@ using QueueUp.Api.Domain;
 using QueueUp.Api.Endpoints;
 using QueueUp.Api.Hubs;
 using System.Security.Claims;
+using QueueUp.Api.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<QueueStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<QueueNotifier>();
+builder.Services.AddHostedService<PrivacyCleanupService>();
 
 JwtOptions jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
     ?? throw new InvalidOperationException("The 'Jwt' settings are missing.");
