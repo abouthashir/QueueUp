@@ -98,6 +98,13 @@ public class QueueStore
         _db.Queues.Add(queue);
     }
 
+    public async Task<int> ForgetCustomerNamesBeforeAsync(DateOnly cutoff, CancellationToken cancellationToken)
+    {
+        return await _db.Tokens
+            .Where(token => token.ServiceDate < cutoff && token.CustomerName != null)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(token => token.CustomerName, (string?)null), cancellationToken);
+    }
+
     public async Task SaveChangesAsync()
     {
         await _db.SaveChangesAsync();

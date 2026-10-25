@@ -80,6 +80,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
+{
+    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+    await context.Response.WriteAsJsonAsync(new { message = "Something went wrong on our side. Please try again." });
+}));
+
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
