@@ -63,4 +63,19 @@ public class TokenResponseTests
         Assert.Equal(QueueStatus.Closed, response.QueueStatus);
         Assert.Equal(TokenStatus.Cancelled, response.Status);
     }
+
+    [Fact]
+    public void From_ListsTheTokensNowBeingServed()
+    {
+        var queue = CreateOpenQueue();
+        queue.Join("Anu", Morning);
+        queue.Join("Rahul", Morning);
+        var meera = queue.Join("Meera", Morning);
+        queue.CallNext("Counter 1", Morning);
+        queue.CallNext("Counter 2", Morning);
+
+        var response = TokenResponse.From(queue, meera);
+
+        Assert.Equal(new[] { "A-001", "A-002" }, response.NowServing);
+    }
 }

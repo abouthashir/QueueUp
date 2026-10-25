@@ -353,3 +353,6 @@ Authorization: Bearer {{ownerToken}}
 ### 49. Temp's old pass right after removal (expect 401)
 GET {{baseUrl}}/api/queues
 Authorization: Bearer {{tempLogin.response.body.$.token}}
+
+### 50. TV display data (public, no pass)
+GET {{baseUrl}}/api/queues/{{queueId}}/display

@@ -90,6 +90,25 @@ public static class QueueEndpoints
                 BusinessProfileResponse.From(business)));
         });
 
+        app.MapGet("/api/queues/{queueId:guid}/display", async (Guid queueId, QueueStore store, TimeProvider clock) =>
+        {
+            Queue? queue = await store.FindQueueAsync(queueId);
+
+            if (queue == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            Business? business = await store.FindBusinessAsync(queue.BusinessId);
+
+            if (business == null)
+            {
+                return ApiErrors.QueueNotFound(queueId);
+            }
+
+            return Results.Ok(DisplayResponse.From(business, queue, clock.GetUtcNow()));
+        });
+
         app.MapGet("/api/queues/{queueId:guid}/dashboard", async (Guid queueId, ClaimsPrincipal user, QueueStore store, TimeProvider clock) =>
         {
             Queue? queue = await store.FindQueueForBusinessAsync(queueId, user.GetBusinessId());

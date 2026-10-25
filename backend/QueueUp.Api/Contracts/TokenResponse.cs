@@ -12,7 +12,8 @@ public record TokenResponse(
     string? CustomerName,
     string? CounterName,
     int PeopleAhead,
-    int EstimatedWaitMinutes)
+    int EstimatedWaitMinutes,
+    IReadOnlyList<string> NowServing)
 {
     public static TokenResponse From(Queue queue, Token token)
     {
@@ -38,6 +39,7 @@ public record TokenResponse(
             token.CustomerName,
             token.CounterName,
             peopleAhead,
-            estimatedWaitMinutes);
+            estimatedWaitMinutes,
+            queue.TokensOn(token.ServiceDate, TokenStatus.Called).Select(called => called.DisplayNumber).ToList());
     }
 }
