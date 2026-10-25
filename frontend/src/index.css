@@ -419,3 +419,17 @@ select {
   color: #0b3b37;
   background: #fff;
 }
+
+.landing .steps {
+  margin: 24px 0;
+  padding-left: 24px;
+  text-align: left;
+}
+
+.landing .steps li {
+  margin-bottom: 12px;
+}
+
+.landing-actions {
+  justify-content: center;
+}
