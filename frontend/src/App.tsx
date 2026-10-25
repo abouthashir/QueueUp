@@ -3,8 +3,10 @@ import RequireLogin from './components/RequireLogin';
 import CounterPage from './pages/CounterPage';
 import JoinPage from './pages/JoinPage';
 import LoginPage from './pages/LoginPage';
+import QueueSettingsPage from './pages/QueueSettingsPage';
 import QueuesPage from './pages/QueuesPage';
 import SignupPage from './pages/SignupPage';
+import StaffPage from './pages/StaffPage';
 import TokenPage from './pages/TokenPage';
 import BusinessPage from './pages/BusinessPage';
 
@@ -28,6 +30,22 @@ export default function App() {
         element={
           <RequireLogin>
             <CounterPage />
+          </RequireLogin>
+        }
+      />
+      <Route
+        path="/queues/:queueId"
+        element={
+          <RequireLogin ownerOnly>
+            <QueueSettingsPage />
+          </RequireLogin>
+        }
+      />
+      <Route
+        path="/staff"
+        element={
+          <RequireLogin ownerOnly>
+            <StaffPage />
           </RequireLogin>
         }
       />

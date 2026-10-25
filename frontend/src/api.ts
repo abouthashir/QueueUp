@@ -72,6 +72,32 @@ export interface JoinInfo {
   business: BusinessProfile;
 }
 
+export interface QueueOverview {
+  id: string;
+  name: string;
+  prefix: string;
+  averageServiceMinutes: number;
+  status: QueueStatus;
+  peopleWaiting: number;
+  issuedToday: number;
+  servedToday: number;
+  noShowsToday: number;
+}
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  email: string;
+  counterName: string;
+}
+
+export interface NewStaff {
+  name: string;
+  email: string;
+  password: string;
+  counterName: string;
+}
+
 export interface NewQueue {
   name: string;
   prefix: string;
@@ -180,8 +206,8 @@ export function login(email: string, password: string): Promise<AuthInfo> {
   });
 }
 
-export function getMyQueues(): Promise<QueueInfo[]> {
-  return request<QueueInfo[]>('/api/queues');
+export function getMyQueues(): Promise<QueueOverview[]> {
+  return request<QueueOverview[]>('/api/queues');
 }
 
 export function createQueue(queue: NewQueue): Promise<QueueInfo> {
@@ -202,4 +228,36 @@ export function updateBusiness(profile: BusinessProfile): Promise<BusinessProfil
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(profile),
   });
+}
+
+export function updateQueue(queueId: string, name: string, averageServiceMinutes: number): Promise<QueueOverview> {
+  return request<QueueOverview>(`/api/queues/${queueId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, averageServiceMinutes }),
+  });
+}
+
+export function getStaff(): Promise<StaffMember[]> {
+  return request<StaffMember[]>('/api/staff');
+}
+
+export function createStaff(staff: NewStaff): Promise<StaffMember> {
+  return request<StaffMember>('/api/staff', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(staff),
+  });
+}
+
+export function updateStaff(staffId: string, name: string, counterName: string): Promise<StaffMember> {
+  return request<StaffMember>(`/api/staff/${staffId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, counterName }),
+  });
+}
+
+export function removeStaff(staffId: string): Promise<null> {
+  return request<null>(`/api/staff/${staffId}`, { method: 'DELETE' });
 }

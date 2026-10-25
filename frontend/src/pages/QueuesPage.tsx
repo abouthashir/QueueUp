@@ -1,13 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
-import { createQueue, getMyQueues, type QueueInfo } from '../api';
+import { createQueue, getMyQueues, type QueueOverview } from '../api';;
 import { loadAuth } from '../authStorage';
 import StaffHeader from '../components/StaffHeader';
 
 export default function QueuesPage() {
   const isOwner = loadAuth()?.role === 'Owner';
 
-  const [queues, setQueues] = useState<QueueInfo[] | null>(null);
+  const [queues, setQueues] = useState<QueueOverview[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadCount, setReloadCount] = useState(0);
   const [name, setName] = useState('');
@@ -75,7 +75,10 @@ export default function QueuesPage() {
             <li key={queue.id} className="panel">
               <h2>{queue.name}</h2>
               <p className="muted">
-                {queue.status} · {queue.peopleWaiting} waiting
+                {queue.prefix} · {queue.status} · {queue.peopleWaiting} waiting
+              </p>
+              <p className="counts">
+                Today: {queue.issuedToday} issued · {queue.servedToday} served · {queue.noShowsToday} no-shows
               </p>
               <div className="actions">
                 <Link className="button-link" to={`/counter/${queue.id}`}>
@@ -84,6 +87,11 @@ export default function QueuesPage() {
                 <Link className="button-link secondary" to={`/q/${queue.id}`}>
                   Customer page
                 </Link>
+                {isOwner && (
+                  <Link className="button-link secondary" to={`/queues/${queue.id}`}>
+                    Settings
+                  </Link>
+                )}
               </div>
             </li>
           ))}
