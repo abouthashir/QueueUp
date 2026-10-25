@@ -1,7 +1,11 @@
 let audioContext: AudioContext | null = null;
 
-export async function enableAlerts(): Promise<void> {
+export function unlockSound(): void {
   audioContext ??= new AudioContext();
+}
+
+export async function enableAlerts(): Promise<void> {
+  unlockSound();
 
   if ('Notification' in window && Notification.permission === 'default') {
     await Notification.requestPermission();
@@ -18,7 +22,7 @@ export function alertCustomer(title: string, body: string): void {
   showNotification(title, body);
 }
 
-function playChime(): void {
+export function playChime(): void {
   if (!audioContext) {
     return;
   }

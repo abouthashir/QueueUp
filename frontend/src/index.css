@@ -342,3 +342,80 @@ select {
     background: #fff;
   }
 }
+
+.display {
+  min-height: 100vh;
+  padding: 3vh 4vw;
+  color: #fff;
+  background: #0b3b37;
+  text-align: center;
+  font-size: clamp(1rem, 2.2vw, 2.5rem);
+}
+
+.display h2 {
+  margin: 4vh 0 1vh;
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #b8e6df;
+}
+
+.display-header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+.display-header p {
+  margin: 0;
+}
+
+.display-status {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #fde68a;
+}
+
+.display-serving {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3vw;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.display-serving li {
+  display: flex;
+  flex-direction: column;
+  min-width: 22vw;
+  padding: 2vh 2vw;
+  border-radius: 16px;
+  background: #115e59;
+}
+
+.display-number {
+  font-size: 3.5em;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.display-counter {
+  font-size: 1.3em;
+}
+
+.display-next {
+  font-size: 2em;
+  font-weight: 700;
+  white-space: pre-wrap;
+}
+
+.display-empty {
+  font-size: 1.5em;
+}
+
+.display-start {
+  margin-top: 4vh;
+  color: #0b3b37;
+  background: #fff;
+}

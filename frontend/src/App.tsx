@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router';
 import RequireLogin from './components/RequireLogin';
 import CounterPage from './pages/CounterPage';
+import DisplayPage from './pages/DisplayPage';
 import JoinPage from './pages/JoinPage';
 import LoginPage from './pages/LoginPage';
 import PosterPage from './pages/PosterPage';
@@ -16,6 +17,7 @@ export default function App() {
     <Routes>
       <Route path="/q/:queueId" element={<JoinPage />} />
       <Route path="/t/:tokenId" element={<TokenPage />} />
+      <Route path="/display/:queueId" element={<DisplayPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route
