@@ -1,5 +1,5 @@
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using QueueUp.Api.Domain;
 
 namespace QueueUp.Api.Data;
@@ -122,7 +122,7 @@ public class QueueStore
             _db.ChangeTracker.Clear();
             return false;
         }
-        catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
+        catch (DbUpdateException exception) when (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
             _db.ChangeTracker.Clear();
             return false;

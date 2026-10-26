@@ -8,16 +8,16 @@ click, and a TV board shows who is being served.
 
 | Folder | What it is |
 |---|---|
-| `backend/QueueUp.Api` | ASP.NET Core (.NET 10) minimal API, EF Core with SQL Server, SignalR, JWT logins |
-| `backend/QueueUp.Api.Tests` | xUnit unit tests and integration tests against a real SQL Server |
+| `backend/QueueUp.Api` | ASP.NET Core (.NET 10) minimal API, EF Core with PostgreSQL, SignalR, JWT logins |
+| `backend/QueueUp.Api.Tests` | xUnit unit tests and integration tests against a real PostgreSQL |
 | `frontend` | React + TypeScript (Vite), React Router, SignalR client, Vitest |
 
 ## Run it locally
 
-You need the .NET 10 SDK, Node.js and SQL Server LocalDB.
+You need the .NET 10 SDK, Node.js and PostgreSQL.
 
 ```bash
-dotnet user-secrets set "Jwt:SigningKey" "<at least 32 random characters>" --project backend/QueueUp.Api
+dotnet user-secrets set "ConnectionStrings:QueueUp" "Host=localhost;Database=queueup;Username=postgres;Password=<password>" --project backend/QueueUp.Api
 dotnet ef database update --project backend/QueueUp.Api
 dotnet run --project backend/QueueUp.Api
 ```
@@ -39,8 +39,8 @@ dotnet test
 cd frontend && npm test
 ```
 
-The integration tests create and delete their own database. They use LocalDB unless the `QUEUEUP_TEST_SQL`
-environment variable names another SQL Server.
+The integration tests create and delete their own database on the PostgreSQL server named by the
+`QUEUEUP_TEST_PG` environment variable.
 
 ## Configuration
 

@@ -25,7 +25,7 @@ string connectionString = builder.Configuration.GetConnectionString("QueueUp")
     ?? throw new InvalidOperationException("Connection string 'QueueUp' is missing.");
 
 builder.Services.AddDbContext<QueueUpDbContext>(options =>
-    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
+    options.UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<QueueStore>();
 builder.Services.AddSingleton(TimeProvider.System);

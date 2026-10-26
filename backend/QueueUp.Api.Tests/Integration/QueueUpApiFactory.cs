@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using QueueUp.Api.Background;
 using QueueUp.Api.Data;
 
@@ -10,16 +10,17 @@ namespace QueueUp.Api.Tests.Integration;
 
 public class QueueUpApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private const string DefaultServer = @"Server=(localdb)\MSSQLLocalDB;Trusted_Connection=True;TrustServerCertificate=True";
-
     private readonly string _connectionString;
 
     public QueueUpApiFactory()
     {
-        var connection = new SqlConnectionStringBuilder(
-            Environment.GetEnvironmentVariable("QUEUEUP_TEST_SQL") ?? DefaultServer)
+        string server = Environment.GetEnvironmentVariable("QUEUEUP_TEST_PG")
+            ?? throw new InvalidOperationException(
+                "Set the QUEUEUP_TEST_PG environment variable to a PostgreSQL server, e.g. Host=localhost;Username=postgres;Password=…");
+
+        var connection = new NpgsqlConnectionStringBuilder(server)
         {
-            InitialCatalog = $"QueueUpTests_{Guid.NewGuid():N}"
+            Database = $"queueup_tests_{Guid.NewGuid():N}"
         };
         _connectionString = connection.ConnectionString;
     }
