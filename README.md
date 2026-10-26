@@ -17,6 +17,7 @@ click, and a TV board shows who is being served.
 You need the .NET 10 SDK, Node.js and PostgreSQL.
 
 ```bash
+dotnet user-secrets set "Jwt:SigningKey" "<at least 32 random characters>" --project backend/QueueUp.Api
 dotnet user-secrets set "ConnectionStrings:QueueUp" "Host=localhost;Database=queueup;Username=postgres;Password=<password>" --project backend/QueueUp.Api
 dotnet ef database update --project backend/QueueUp.Api
 dotnet run --project backend/QueueUp.Api
