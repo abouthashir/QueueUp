@@ -83,6 +83,14 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/queueup-api:latest
             ghcr.io/${{ github.repository_owner }}/queueup-api:${{ github.sha }}
   
+  api-deploy:
+    needs: [api-image]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ask Render to deploy the new image
+        run: curl --fail --silent --show-error --request POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
   
   web-deploy:
     needs: [backend, frontend]
