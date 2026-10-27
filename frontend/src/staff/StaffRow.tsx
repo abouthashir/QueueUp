@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import type { StaffMember } from '../api';
+import { Button } from '../ui/Button';
+import TextField from '../ui/TextField';
+import styles from './StaffRow.module.css';
 
 interface StaffRowProps {
   staff: StaffMember;
@@ -21,35 +24,31 @@ export default function StaffRow({ staff, busy, onSave, onRemove }: StaffRowProp
 
   if (editing) {
     return (
-      <li className="panel">
-        <form onSubmit={handleSubmit} className="form">
-          <label htmlFor={`name-${staff.id}`}>Name</label>
-          <input
+      <li className={styles.row}>
+        <form onSubmit={handleSubmit} className={styles.editForm}>
+          <TextField
             id={`name-${staff.id}`}
-            type="text"
+            label="Name"
             required
             maxLength={100}
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
-
-          <label htmlFor={`counter-${staff.id}`}>Counter</label>
-          <input
+          <TextField
             id={`counter-${staff.id}`}
-            type="text"
+            label="Counter"
             required
             maxLength={50}
             value={counterName}
             onChange={(event) => setCounterName(event.target.value)}
           />
-
-          <div className="actions">
-            <button type="submit" disabled={busy}>
+          <div className={styles.actions}>
+            <Button type="submit" disabled={busy}>
               Save
-            </button>
-            <button type="button" className="secondary" onClick={() => setEditing(false)}>
+            </Button>
+            <Button variant="ghost" onClick={() => setEditing(false)}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </li>
@@ -57,18 +56,23 @@ export default function StaffRow({ staff, busy, onSave, onRemove }: StaffRowProp
   }
 
   return (
-    <li className="panel">
-      <h2>{staff.name}</h2>
-      <p className="muted">
-        {staff.counterName} · {staff.email}
-      </p>
-      <div className="actions">
-        <button type="button" className="secondary small" disabled={busy} onClick={() => setEditing(true)}>
+    <li className={styles.row}>
+      <span className={styles.avatar} aria-hidden="true">
+        {staff.name.slice(0, 1).toUpperCase()}
+      </span>
+      <div className={styles.who}>
+        <h3 className={styles.name}>{staff.name}</h3>
+        <p className={styles.meta}>
+          {staff.counterName} · {staff.email}
+        </p>
+      </div>
+      <div className={styles.actions}>
+        <Button variant="outline" disabled={busy} onClick={() => setEditing(true)}>
           Edit
-        </button>
-        <button type="button" className="secondary small" disabled={busy} onClick={() => onRemove(staff)}>
+        </Button>
+        <Button variant="ghost" className={styles.danger} disabled={busy} onClick={() => onRemove(staff)}>
           Remove
-        </button>
+        </Button>
       </div>
     </li>
   );

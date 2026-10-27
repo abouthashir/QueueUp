@@ -1,7 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { createStaff, getStaff, removeStaff, updateStaff, type NewStaff, type StaffMember } from '../api';
-import StaffHeader from '../components/StaffHeader';
-import StaffRow from '../components/StaffRow';
+import AppShell, { ShellMessage } from '../app/AppShell';
+import StaffRow from '../staff/StaffRow';
+import { Button } from '../ui/Button';
+import TextField from '../ui/TextField';
+import styles from '../app/OwnerPage.module.css';
 
 const EMPTY_STAFF: NewStaff = { name: '', email: '', password: '', counterName: '' };
 
@@ -71,77 +74,100 @@ export default function StaffPage() {
     runAction(() => removeStaff(member.id), `${member.name} was removed.`);
   }
 
+  if (!staff) {
+    return (
+      <AppShell>
+        <ShellMessage message={error ?? 'Loading…'} error={error !== null} />
+      </AppShell>
+    );
+  }
+
   return (
-    <main className="page page-wide">
-      <StaffHeader />
-      <h1>Staff</h1>
+    <AppShell>
+      <div className={styles.page}>
+        <header>
+          <h1 className={styles.title}>Staff</h1>
+          <p className={styles.intro}>
+            Staff can log in, call tokens and run the queue from their counter. Only you can change settings.
+          </p>
+        </header>
 
-      {!staff && !error && <p className="muted">Loading…</p>}
-      {staff && staff.length === 0 && <p className="muted">No staff yet. Add your first team member below.</p>}
+        <div aria-live="polite" className={styles.messages}>
+          {notice && <p className={styles.notice}>{notice}</p>}
+          {error && (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          )}
+        </div>
 
-      {staff && staff.length > 0 && (
-        <ul className="queue-list">
-          {staff.map((member) => (
-            <StaffRow key={member.id} staff={member} busy={busy} onSave={handleSave} onRemove={handleRemove} />
-          ))}
-        </ul>
-      )}
+        <div className={styles.panels}>
+          <section className={styles.panel} aria-labelledby="team-title">
+            <h2 id="team-title" className={styles.panelTitle}>
+              Your team
+            </h2>
+            {staff.length === 0 ? (
+              <p className={styles.empty}>No staff yet. Add your first team member here.</p>
+            ) : (
+              <ul className={styles.list}>
+                {staff.map((member) => (
+                  <StaffRow key={member.id} staff={member} busy={busy} onSave={handleSave} onRemove={handleRemove} />
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <div aria-live="polite">
-        {notice && <p className="notice">{notice}</p>}
-        {error && <p className="error" role="alert">{error}</p>}
+          <section className={styles.panel} aria-labelledby="add-title">
+            <h2 id="add-title" className={styles.panelTitle}>
+              Add staff
+            </h2>
+            <form onSubmit={handleAdd} className={styles.form}>
+              <TextField
+                id="staff-name"
+                label="Name"
+                required
+                maxLength={100}
+                value={newStaff.name}
+                onChange={(event) => update('name', event.target.value)}
+              />
+              <TextField
+                id="staff-email"
+                label="Email"
+                type="email"
+                required
+                maxLength={200}
+                value={newStaff.email}
+                onChange={(event) => update('email', event.target.value)}
+              />
+              <TextField
+                id="staff-password"
+                label="Starting password"
+                hint="At least 8 characters. Share it with them in person."
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={newStaff.password}
+                onChange={(event) => update('password', event.target.value)}
+              />
+              <TextField
+                id="staff-counter"
+                label="Counter"
+                required
+                maxLength={50}
+                placeholder="Counter 2"
+                value={newStaff.counterName}
+                onChange={(event) => update('counterName', event.target.value)}
+              />
+              <div className={styles.formActions}>
+                <Button type="submit" disabled={busy}>
+                  {busy ? 'Adding…' : 'Add staff'}
+                </Button>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
-
-      <section className="panel">
-        <h2>Add staff</h2>
-        <form onSubmit={handleAdd} className="form">
-          <label htmlFor="staff-name">Name</label>
-          <input
-            id="staff-name"
-            type="text"
-            required
-            maxLength={100}
-            value={newStaff.name}
-            onChange={(event) => update('name', event.target.value)}
-          />
-
-          <label htmlFor="staff-email">Email</label>
-          <input
-            id="staff-email"
-            type="email"
-            required
-            maxLength={200}
-            value={newStaff.email}
-            onChange={(event) => update('email', event.target.value)}
-          />
-
-          <label htmlFor="staff-password">Starting password (at least 8 characters)</label>
-          <input
-            id="staff-password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            value={newStaff.password}
-            onChange={(event) => update('password', event.target.value)}
-          />
-
-          <label htmlFor="staff-counter">Counter</label>
-          <input
-            id="staff-counter"
-            type="text"
-            required
-            maxLength={50}
-            placeholder="Counter 2"
-            value={newStaff.counterName}
-            onChange={(event) => update('counterName', event.target.value)}
-          />
-
-          <button type="submit" disabled={busy}>
-            {busy ? 'Adding…' : 'Add staff'}
-          </button>
-        </form>
-      </section>
-    </main>
+    </AppShell>
   );
 }

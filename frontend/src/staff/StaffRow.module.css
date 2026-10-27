@@ -1,0 +1,63 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--line-2);
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-weight: 650;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 50%;
+}
+
+.who {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.name {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.meta {
+  margin-top: var(--space-1);
+  overflow-wrap: anywhere;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.editForm {
+  display: grid;
+  flex-basis: 100%;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .editForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .editForm .actions {
+    grid-column: 1 / -1;
+  }
+}
