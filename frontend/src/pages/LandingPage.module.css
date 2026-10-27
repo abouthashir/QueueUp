@@ -34,7 +34,9 @@
 }
 
 /* Framed sections line their content up with the page container. */
-.hero {
+.hero,
+.night,
+.closing {
   --inline: max(var(--gutter), calc((100% - var(--container)) / 2));
 }
 
@@ -595,5 +597,240 @@
 
   .place:nth-child(3) .placePhoto {
     aspect-ratio: 2 / 3;
+  }
+}
+
+/* ---------- How it works: the dark section ---------- */
+.nightFrame {
+  padding: 0 var(--frame);
+}
+
+.night {
+  padding: var(--section) var(--inline);
+  color: var(--on-night);
+  background: var(--night);
+  border-radius: var(--radius-md);
+}
+
+.nightHead .sideLabel {
+  color: var(--on-night-2);
+}
+
+.nightTitle {
+  grid-column: 1 / -1;
+}
+
+.steps {
+  row-gap: var(--space-6);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  grid-column: 1 / -1;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--night-line);
+}
+
+.stepNumber {
+  display: block;
+  font-size: clamp(2.5rem, 1.8rem + 2.5vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--on-night-2);
+}
+
+.steps h3 {
+  margin-top: var(--space-7);
+  font-size: var(--text-h3);
+}
+
+.steps p {
+  max-width: 22rem;
+  margin-top: var(--space-2);
+  color: var(--on-night-2);
+}
+
+.boardWrap {
+  margin-top: var(--space-9);
+}
+
+.caption {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--on-night-2);
+}
+
+@media (min-width: 768px) {
+  .steps li {
+    grid-column: span 4;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nightTitle {
+    grid-column: 4 / -1;
+  }
+
+  .steps li {
+    grid-column: span 3;
+  }
+
+  .steps li:first-child {
+    grid-column: 4 / span 3;
+  }
+}
+
+/* ---------- Fair & private ---------- */
+.fair {
+  padding-bottom: var(--section);
+}
+
+.fairIntro,
+.rules {
+  grid-column: 1 / -1;
+}
+
+.rules {
+  margin: var(--space-7) 0 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.rules li {
+  display: grid;
+  gap: var(--space-1) var(--space-6);
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--line);
+}
+
+.rules h3 {
+  font-size: 1.0625rem;
+  letter-spacing: -0.015em;
+}
+
+.rules p {
+  color: var(--muted);
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-7) var(--column-gap);
+  margin: var(--space-9) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.numberValue {
+  display: block;
+  font-size: clamp(3.5rem, 2rem + 5.5vw, 7rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.numberText {
+  display: block;
+  max-width: 13rem;
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 640px) {
+  .rules li {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .fairIntro {
+    grid-column: 1 / span 5;
+  }
+
+  .rules {
+    grid-column: 7 / -1;
+    margin-top: 0;
+  }
+
+  .numbers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Closing: the next token, waiting ---------- */
+.closingFrame {
+  padding: 0 var(--frame);
+}
+
+.closing {
+  row-gap: var(--space-8);
+  align-items: end;
+  padding: var(--section) var(--inline);
+  color: var(--on-night);
+  background: var(--night);
+  border-radius: var(--radius-md);
+}
+
+.closingContent,
+.nextToken {
+  grid-column: 1 / -1;
+}
+
+.closingLabel {
+  color: var(--on-night-2);
+}
+
+.closingTitle {
+  max-width: 12ch;
+  margin-top: var(--space-4);
+  font-size: clamp(2.5rem, 1.3rem + 4.8vw, 5.5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+}
+
+.closingContent p:not(:global(.label)) {
+  max-width: 30rem;
+  margin-top: var(--space-5);
+  font-size: var(--text-lead);
+  color: rgba(243, 243, 240, 0.8);
+}
+
+.nextToken {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  color: var(--on-night-2);
+  border-top: 1px solid var(--night-line);
+}
+
+.nextNumber {
+  font-size: clamp(4rem, 30cqi, 13rem);
+  font-weight: 650;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  color: var(--signal);
+}
+
+@media (min-width: 1024px) {
+  .closingContent {
+    grid-column: 1 / span 6;
+  }
+
+  .nextToken {
+    grid-column: 8 / -1;
+    align-items: flex-end;
+    padding-top: 0;
+    border-top: 0;
   }
 }

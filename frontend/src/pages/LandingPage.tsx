@@ -58,6 +58,27 @@ const PLACES = [
   { photo: 'salon', alt: 'Three salon chairs facing round mirrors', title: 'Salons', text: 'Walk-ins get an honest wait time and can step out for a while.' },
 ];
 
+const STEPS = [
+  { title: 'Print the poster', text: 'Create a queue and print its A4 QR poster. Put it by the door.' },
+  { title: 'Customers scan', text: 'They get a token number on their phone and can step away.' },
+  { title: 'Call next', text: 'One button. The phone, the counter and the TV board change together.' },
+];
+
+const RULES = [
+  { title: 'First come, first served', text: 'Numbers are given in order and start again each day.' },
+  { title: 'No double calls', text: 'Two counters are never given the same person.' },
+  { title: 'No sign-up for customers', text: 'A name is optional. Nothing else is asked.' },
+  { title: 'Names erased after 30 days', text: 'QueueUp removes customer names on its own.' },
+  { title: 'Your queues stay yours', text: 'Each business sees only its own queues and staff.' },
+];
+
+const FACTS = [
+  { value: '0', text: 'apps to install' },
+  { value: '1', text: 'click to call the next person' },
+  { value: '2s', text: 'or less for every screen to update' },
+  { value: '30', text: 'days, then names are erased' },
+];
+
 export default function LandingPage() {
   const loggedIn = loadAuth() !== null;
   const startTo = loggedIn ? '/dashboard' : '/signup';
@@ -214,6 +235,35 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ---------- How it works ---------- */}
+        <section id="how" className={styles.nightFrame}>
+          <div className={styles.night}>
+            <div className={`grid-12 ${styles.nightHead}`}>
+              <p className={`label ${styles.sideLabel}`}>How it works</p>
+              <Reveal className={styles.nightTitle}>
+                <h2 className={styles.h2}>From a paper poster to your first call.</h2>
+              </Reveal>
+            </div>
+
+            <ol className={`grid-12 ${styles.steps}`}>
+              {STEPS.map((step, index) => (
+                <li key={step.title}>
+                  <Reveal delay={index * 90}>
+                    <span className={`num ${styles.stepNumber}`}>{index + 1}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.text}</p>
+                  </Reveal>
+                </li>
+              ))}
+            </ol>
+
+            <Reveal className={styles.boardWrap}>
+              <BoardMockup large />
+              <p className={styles.caption}>The TV board in your waiting area, readable from across the room.</p>
+            </Reveal>
+          </div>
+        </section>
+
         {/* ---------- Places ---------- */}
         <section className={`container grid-12 ${styles.places}`}>
           <p className={`label ${styles.sideLabel}`}>Made for</p>
@@ -229,6 +279,64 @@ export default function LandingPage() {
                 <p>{place.text}</p>
               </Reveal>
             ))}
+          </div>
+        </section>
+
+        {/* ---------- Fair & private ---------- */}
+        <section id="fair" className={`container ${styles.fair}`}>
+          <div className="grid-12">
+            <Reveal className={styles.fairIntro}>
+              <p className="label">Fair &amp; private</p>
+              <h2 className={styles.h2}>The rules are built in.</h2>
+              <p className={styles.body}>Fairness and privacy shouldn't depend on who is at the desk that day.</p>
+            </Reveal>
+
+            <ul className={styles.rules}>
+              {RULES.map((rule) => (
+                <li key={rule.title}>
+                  <h3>{rule.title}</h3>
+                  <p>{rule.text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <ul className={styles.numbers}>
+            {FACTS.map((fact, index) => (
+              <li key={fact.value}>
+                <Reveal delay={index * 80}>
+                  <span className={`num ${styles.numberValue}`}>{fact.value}</span>
+                  <span className={styles.numberText}>{fact.text}</span>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ---------- Closing ---------- */}
+        <section className={styles.closingFrame}>
+          <div className={`grid-12 ${styles.closing}`}>
+            <Reveal className={styles.closingContent}>
+              <p className={`label ${styles.closingLabel}`}>Start today</p>
+              <h2 className={styles.closingTitle}>Your first customer is waiting.</h2>
+              <p>Create a queue, print the poster and open your doors. It's free to start.</p>
+              <div className={styles.actions}>
+                <ButtonLink to={startTo} variant="light" size="lg">
+                  {startLabel}
+                  <Icon name="arrow" size={18} />
+                </ButtonLink>
+                {!loggedIn && (
+                  <ButtonLink to="/login" variant="glass" size="lg">
+                    Log in
+                  </ButtonLink>
+                )}
+              </div>
+            </Reveal>
+
+            <div className={styles.nextToken} aria-hidden="true">
+              <span className="label">Next token</span>
+              <span className={`num ${styles.nextNumber}`}>A-001</span>
+            </div>
           </div>
         </section>
       </main>
