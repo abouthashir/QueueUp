@@ -1,8 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { getMyQueues, updateQueue, type QueueOverview } from '../api';
-import StaffHeader from '../components/StaffHeader';
+import AppShell, { ShellMessage } from '../app/AppShell';
 import { parseDailyLimit } from '../limits';
+import { Button, ButtonLink } from '../ui/Button';
+import Icon from '../ui/Icon';
+import QueueStatusBadge from '../ui/QueueStatusBadge';
+import TextField from '../ui/TextField';
+import styles from '../app/OwnerPage.module.css';
 
 export default function QueueSettingsPage() {
   const { queueId } = useParams();
@@ -70,75 +75,109 @@ export default function QueueSettingsPage() {
     setBusy(false);
   }
 
+  if (!queue) {
+    return (
+      <AppShell>
+        <ShellMessage message={error ?? 'Loading…'} error={error !== null} />
+      </AppShell>
+    );
+  }
+
   return (
-    <main className="page page-wide">
-      <StaffHeader />
-      <h1>{queue ? queue.name : 'Queue settings'}</h1>
+    <AppShell>
+      <div className={styles.page}>
+        <header>
+          <p className={`label ${styles.kicker}`}>Queue settings</p>
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>{queue.name}</h1>
+            <QueueStatusBadge status={queue.status} />
+          </div>
+          <p className={styles.intro}>Tokens in this queue start with the letter {queue.prefix}.</p>
+        </header>
 
-      {!queue && !error && <p className="muted">Loading…</p>}
+        <div aria-live="polite" className={styles.messages}>
+          {notice && <p className={styles.notice}>{notice}</p>}
+          {error && (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          )}
+        </div>
 
-      {queue && (
-        <>
-          <p className="muted">
-            Token letter {queue.prefix} · {queue.status}
-          </p>
-
-          <form onSubmit={handleSubmit} className="form panel">
-            <label htmlFor="queue-name">Name</label>
-            <input
-              id="queue-name"
-              type="text"
-              required
-              maxLength={100}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-
-            <label htmlFor="queue-minutes">Average minutes per customer</label>
-            <input
-              id="queue-minutes"
-              type="number"
-              required
-              min={1}
-              max={120}
-              value={minutes}
-              onChange={(event) => setMinutes(event.target.value)}
-            />
-
-            <label htmlFor="queue-limit">Daily token limit (optional)</label>
-            <input
-              id="queue-limit"
-              type="number"
-              min={1}
-              max={1000}
-              placeholder="No limit"
-              value={dailyLimit}
-              onChange={(event) => setDailyLimit(event.target.value)}
-            />
-
-            <button type="submit" disabled={busy}>
-              {busy ? 'Saving…' : 'Save'}
-            </button>
-          </form>
-
-          <section className="panel">
-            <h2>Share this queue</h2>
-            <div className="actions">
-              <Link className="button-link" to={`/queues/${queue.id}/poster`}>
-                QR poster
-              </Link>
-              <Link className="button-link secondary" to={`/display/${queue.id}`}>
-                TV display
-              </Link>
-            </div>
+        <div className={styles.panels}>
+          <section className={styles.panel} aria-labelledby="details-title">
+            <h2 id="details-title" className={styles.panelTitle}>
+              Details
+            </h2>
+            <form onSubmit={handleSubmit} className={`${styles.form} ${styles.columns}`}>
+              <TextField
+                id="queue-name"
+                label="Name"
+                className={styles.wide}
+                required
+                maxLength={100}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+              <TextField
+                id="queue-minutes"
+                label="Minutes per customer"
+                hint="On average. Used for wait times."
+                type="number"
+                required
+                min={1}
+                max={120}
+                value={minutes}
+                onChange={(event) => setMinutes(event.target.value)}
+              />
+              <TextField
+                id="queue-limit"
+                label="Daily token limit"
+                optional
+                hint="Leave empty for no limit."
+                type="number"
+                min={1}
+                max={1000}
+                value={dailyLimit}
+                onChange={(event) => setDailyLimit(event.target.value)}
+              />
+              <div className={styles.formActions}>
+                <Button type="submit" disabled={busy}>
+                  {busy ? 'Saving…' : 'Save'}
+                </Button>
+              </div>
+            </form>
           </section>
-        </>
-      )}
 
-      <div aria-live="polite">
-        {notice && <p className="notice">{notice}</p>}
-        {error && <p className="error" role="alert">{error}</p>}
+          <section className={styles.panel} aria-labelledby="share-title">
+            <h2 id="share-title" className={styles.panelTitle}>
+              Share this queue
+            </h2>
+            <ul className={styles.list}>
+              <li className={styles.share}>
+                <div>
+                  <h3>QR poster</h3>
+                  <p>Print it and put it where people arrive.</p>
+                </div>
+                <ButtonLink to={`/queues/${queue.id}/poster`} variant="outline">
+                  Open
+                  <Icon name="arrow" size={18} />
+                </ButtonLink>
+              </li>
+              <li className={styles.share}>
+                <div>
+                  <h3>TV display</h3>
+                  <p>Open it on the screen in your waiting room.</p>
+                </div>
+                <ButtonLink to={`/display/${queue.id}`} variant="outline">
+                  Open
+                  <Icon name="arrow" size={18} />
+                </ButtonLink>
+              </li>
+            </ul>
+          </section>
+        </div>
       </div>
-    </main>
+    </AppShell>
   );
 }
