@@ -1,0 +1,120 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 20px;
+  font-size: 0.9375rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--fast) ease,
+    border-color var(--fast) ease,
+    color var(--fast) ease,
+    transform var(--fast) var(--ease);
+}
+
+.button svg {
+  transition: transform var(--fast) var(--ease);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.lg {
+  min-height: 54px;
+  padding: 0 26px;
+  font-size: 1rem;
+}
+
+.block {
+  width: 100%;
+}
+
+.primary {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.outline {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--line);
+}
+
+.ghost {
+  color: inherit;
+  background: transparent;
+  padding-inline: 12px;
+}
+
+.light {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.glass {
+  color: var(--on-night);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.signal {
+  color: var(--ink);
+  background: var(--signal);
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) svg {
+    transform: translateX(3px);
+  }
+
+  .primary:hover:not(:disabled) {
+    background: var(--ink-2);
+  }
+
+  .outline:hover:not(:disabled) {
+    border-color: var(--ink);
+  }
+
+  .ghost:hover:not(:disabled) {
+    background: rgba(127, 120, 110, 0.12);
+  }
+
+  .light:hover:not(:disabled) {
+    background: #fff;
+  }
+
+  .glass:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .signal:hover:not(:disabled) {
+    background: var(--signal-hover);
+  }
+}
+
+@media (pointer: coarse) {
+  .button {
+    min-height: 48px;
+  }
+
+  .lg {
+    min-height: 56px;
+  }
+}
