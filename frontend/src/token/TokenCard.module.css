@@ -1,0 +1,135 @@
+/* Two halves of one paper slip. Masks cut a half-circle notch from each side at the perforation. */
+.slip {
+  --notch: 10px;
+  --pad: clamp(1.25rem, 1rem + 1.6vw, 2rem);
+
+  container-type: inline-size;
+  color: var(--ink);
+  filter: drop-shadow(0 1px 1px rgba(19, 19, 17, 0.06)) drop-shadow(0 20px 28px rgba(19, 19, 17, 0.14));
+}
+
+.top,
+.bottom {
+  background: var(--surface);
+  padding: var(--pad);
+}
+
+.top {
+  padding-bottom: calc(var(--pad) * 0.9);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  mask:
+    radial-gradient(circle at 0 100%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) right / 51% 100% no-repeat;
+}
+
+.bottom {
+  padding-top: calc(var(--pad) * 0.9);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background-image: linear-gradient(90deg, var(--line) 50%, transparent 0);
+  background-size: 10px 1px;
+  background-position: 0 0;
+  background-repeat: repeat-x;
+  mask:
+    radial-gradient(circle at 0 0, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, transparent var(--notch), #000 calc(var(--notch) + 0.5px)) right / 51% 100% no-repeat;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--muted);
+}
+
+.number {
+  margin-top: clamp(1.25rem, 0.8rem + 2vw, 2rem);
+  /* Sized by the slip's own width (cqi), so the number always fits on one line. */
+  font-size: clamp(3.25rem, var(--slip-number, 26cqi), 8.5rem);
+  font-weight: 650;
+  line-height: 0.85;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.queue {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.message {
+  font-size: var(--text-h3);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.callout {
+  font-size: var(--text-h3);
+  line-height: 1.2;
+}
+
+.callout strong {
+  display: block;
+  font-size: var(--text-h2);
+  font-weight: 650;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+
+.message+.facts {
+  margin-top: var(--space-4);
+}
+
+.facts dt {
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Smaller slip used inside landing-page compositions. */
+.compact {
+  --notch: 8px;
+  --pad: 1.1rem;
+
+  width: 100%;
+}
+
+.compact .number {
+  margin-top: 1rem;
+}
+
+.compact .message,
+.compact .callout {
+  font-size: 0.95rem;
+}
+
+.compact .callout strong {
+  font-size: 1.6rem;
+}
+
+.compact .facts {
+  gap: var(--space-2) var(--space-4);
+}
+
+.compact .facts dd {
+  font-size: 0.95rem;
+}
