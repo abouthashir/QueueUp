@@ -1,0 +1,27 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.ink {
+  color: var(--ink);
+}
+
+.paper {
+  color: var(--on-night);
+}
+
+/* A token slip: a rounded rectangle with a notch cut from each side. */
+.mark {
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  background:
+    radial-gradient(circle at 0 50%, transparent 3px, currentColor 3.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 3px, currentColor 3.5px) right / 51% 100% no-repeat;
+}
