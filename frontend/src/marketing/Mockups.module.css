@@ -1,0 +1,198 @@
+/* ---------- TV board: amber numbers on black, like the LED boards in clinics ---------- */
+.board {
+  width: min(360px, 100%);
+  padding: 1.1rem 1.25rem 1rem;
+  color: var(--on-night);
+  background: var(--night);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+}
+
+.boardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  color: var(--on-night-2);
+}
+
+.boardQueue {
+  font-size: var(--text-sm);
+}
+
+.boardRows {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.boardRows li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--night-line);
+}
+
+.boardRows li:first-child {
+  border-top: 0;
+}
+
+.boardRows li span:first-child {
+  font-size: 2.25rem;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.boardRows li:first-child span:first-child {
+  color: var(--signal);
+}
+
+.boardRows li span:last-child {
+  font-size: var(--text-sm);
+  color: var(--on-night-2);
+}
+
+.boardNext {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  font-size: var(--text-sm);
+  color: var(--on-night-2);
+  border-top: 1px solid var(--night-line);
+}
+
+.boardNext :global(.num) {
+  color: var(--on-night);
+}
+
+/* The big board in the dark section: a full-width "screen". */
+.boardLarge {
+  width: 100%;
+  padding: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+.boardLarge .boardRows li {
+  padding: clamp(0.6rem, 0.3rem + 1vw, 1.1rem) 0;
+}
+
+.boardLarge .boardRows li span:first-child {
+  font-size: clamp(3rem, 1.5rem + 7vw, 7.5rem);
+  letter-spacing: -0.05em;
+}
+
+.boardLarge .boardRows li span:last-child {
+  font-size: var(--text-h3);
+}
+
+.boardLarge .boardNext {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  font-size: var(--text-lead);
+}
+
+/* ---------- Phone ---------- */
+.phone {
+  width: min(292px, 74vw);
+  padding: 8px;
+  background: var(--ink);
+  border-radius: 40px;
+  box-shadow: var(--shadow-float);
+}
+
+.phoneScreen {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  aspect-ratio: 9 / 18.5;
+  padding: 18px 14px 16px;
+  background: var(--paper);
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.phoneBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  transform: scale(0.9);
+  transform-origin: left center;
+}
+
+.phoneLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.phoneLive::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--live);
+}
+
+.phoneButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 13px;
+  font-size: var(--text-sm);
+  font-weight: 560;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: var(--radius-sm);
+}
+
+.phoneLink {
+  margin-top: -4px;
+  font-size: var(--text-sm);
+  font-weight: 560;
+  text-align: center;
+}
+
+/* ---------- Notification ---------- */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(300px, 80vw);
+  padding: 12px 16px 12px 12px;
+  background: var(--glass-light);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+.toastIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--ink);
+  background: var(--signal);
+  border-radius: var(--radius-sm);
+}
+
+.toast strong,
+.toast span span {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+}
+
+.toast span span {
+  color: var(--muted);
+}
