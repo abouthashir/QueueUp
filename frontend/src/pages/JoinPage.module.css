@@ -1,0 +1,107 @@
+/* One phone column: where you are, how long it is, then your name and the button. */
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--gutter);
+}
+
+.main {
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) calc(var(--space-7) + env(safe-area-inset-bottom));
+}
+
+.business {
+  color: var(--muted);
+}
+
+.title {
+  margin-top: var(--space-3);
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.02;
+}
+
+.meta {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.wait {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: var(--space-6) 0 0;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+}
+
+.wait div {
+  padding: var(--space-4) var(--space-5);
+}
+
+.wait div + div {
+  border-left: 1px solid var(--line-2);
+}
+
+.wait dt {
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.wait dd {
+  margin: var(--space-2) 0 0;
+  font-size: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.wait small {
+  font-size: 0.45em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-7);
+}
+
+.notice {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  font-size: var(--text-lead);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+}
+
+.error {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-weight: 560;
+  color: var(--danger);
+  background: #fbe9e7;
+  border-radius: var(--radius-sm);
+}
+
+@media (min-width: 640px) {
+  .main {
+    padding-top: clamp(2rem, 8vh, 5rem);
+  }
+}

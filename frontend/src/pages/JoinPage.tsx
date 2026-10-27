@@ -1,7 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getJoinInfo, getToken, joinQueue, type JoinInfo } from '../api';
+import { getJoinInfo, getToken, joinQueue, type JoinInfo, type QueueStatus } from '../api';
 import { forgetTokenId, loadTokenId, saveTokenId } from '../tokenStorage';
+import Badge, { type BadgeTone } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import Icon from '../ui/Icon';
+import Logo from '../ui/Logo';
+import StatusScreen from '../ui/StatusScreen';
+import TextField from '../ui/TextField';
+import styles from './JoinPage.module.css';
+
+const STATUS_TONE: Record<QueueStatus, BadgeTone> = { Open: 'live', Paused: 'paused', Closed: 'closed' };
 
 export default function JoinPage() {
   const { queueId } = useParams();
@@ -63,60 +72,72 @@ export default function JoinPage() {
     }
   }
 
-  if (error && !info) {
-    return (
-      <main className="page">
-        <p className="error" role="alert">{error}</p>
-      </main>
-    );
-  }
-
   if (!info) {
-    return (
-      <main className="page">
-        <p className="muted">Loading…</p>
-      </main>
-    );
+    return error ? <StatusScreen message={error} error /> : <StatusScreen message="Loading…" />;
   }
 
   const { queue, business } = info;
+  const details = [business.address, business.openingHours && `Open ${business.openingHours}`].filter(Boolean);
 
   return (
-    <main className="page">
-      <p className="business-name">{business.name}</p>
-      <h1>{queue.name}</h1>
-      {business.address && <p className="muted">{business.address}</p>}
-      {business.openingHours && <p className="muted">Open {business.openingHours}</p>}
+    <div className={styles.screen}>
+      <header className={styles.bar}>
+        <Logo />
+        <Badge tone={STATUS_TONE[queue.status]} pulse={queue.status === 'Open'}>
+          {queue.status}
+        </Badge>
+      </header>
 
-      {queue.status === 'Open' && (
-        <>
-          <p className="summary">
-            {queue.peopleWaiting} {queue.peopleWaiting === 1 ? 'person' : 'people'} waiting · about{' '}
-            {queue.estimatedWaitMinutes} min
+      <main className={styles.main}>
+        <p className={`label ${styles.business}`}>{business.name}</p>
+        <h1 className={styles.title}>{queue.name}</h1>
+        {details.length > 0 && <p className={styles.meta}>{details.join(' · ')}</p>}
+
+        {queue.status === 'Open' && (
+          <>
+            <dl className={styles.wait}>
+              <div>
+                <dt>Waiting</dt>
+                <dd className="num">{queue.peopleWaiting}</dd>
+              </div>
+              <div>
+                <dt>About</dt>
+                <dd className="num">
+                  {queue.estimatedWaitMinutes}
+                  <small> min</small>
+                </dd>
+              </div>
+            </dl>
+
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <TextField
+                id="customer-name"
+                label="Your name"
+                optional
+                hint="So staff can greet you. Names are erased after 30 days."
+                autoComplete="given-name"
+                maxLength={100}
+                value={customerName}
+                onChange={(event) => setCustomerName(event.target.value)}
+              />
+
+              <Button type="submit" size="lg" block disabled={joining}>
+                {joining ? 'Getting your token…' : 'Get a token'}
+                {!joining && <Icon name="arrow" size={18} />}
+              </Button>
+            </form>
+          </>
+        )}
+
+        {queue.status === 'Paused' && <p className={styles.notice}>The queue is paused. It will open again soon.</p>}
+        {queue.status === 'Closed' && <p className={styles.notice}>The queue is closed for today.</p>}
+
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
           </p>
-
-          <form onSubmit={handleSubmit} className="form">
-            <label htmlFor="customer-name">Your name (optional)</label>
-            <input
-              id="customer-name"
-              type="text"
-              autoComplete="given-name"
-              maxLength={100}
-              value={customerName}
-              onChange={(event) => setCustomerName(event.target.value)}
-            />
-
-            <button type="submit" disabled={joining}>
-              {joining ? 'Getting your token…' : 'Get token'}
-            </button>
-          </form>
-        </>
-      )}
-
-      {queue.status === 'Paused' && <p className="notice">The queue is paused. Back soon.</p>}
-      {queue.status === 'Closed' && <p className="notice">The queue is closed for today.</p>}
-
-      {error && <p className="error" role="alert">{error}</p>}
-    </main>
+        )}
+      </main>
+    </div>
   );
 }
