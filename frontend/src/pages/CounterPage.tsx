@@ -12,10 +12,8 @@ import {
   skipToken,
   type Dashboard,
 } from '../api';
-import ConnectionNotice from '../components/ConnectionNotice';
-import NowServing from '../components/NowServing';
-import StaffHeader from '../components/StaffHeader';
-import TokenList from '../components/TokenList';
+import AppShell, { ShellMessage } from '../app/AppShell';
+import CounterView from '../counter/CounterView';
 import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 5_000;
@@ -119,84 +117,32 @@ export default function CounterPage() {
 
   if (!dashboard) {
     return (
-      <main className="page">
-        <StaffHeader />
-        {loadError ? <p className="error" role="alert">{loadError}</p> : <p className="muted">Loading…</p>}
-      </main>
+      <AppShell>
+        <ShellMessage message={loadError ?? 'Loading…'} error={loadError !== null} />
+      </AppShell>
     );
   }
 
-  const serving = dashboard.nowServing !== null;
-  const status = dashboard.queue.status;
   const id = dashboard.queue.id;
+  const errors = [actionError, loadError].filter((message): message is string => message !== null);
 
   return (
-    <main className="page page-wide">
-      <ConnectionNotice liveStatus={liveStatus} />
-      <StaffHeader />
-      <header className="counter-header">
-        <h1>{dashboard.queue.name}</h1>
-        <p className="muted">
-          {dashboard.counterName} · {dashboard.queue.status}
-        </p>
-      </header>
-
-      <p className="counts">
-        Waiting {dashboard.waiting.length} · Served {dashboard.servedToday} · Skipped {dashboard.skipped.length}
-      </p>
-
-      <NowServing
-        token={dashboard.nowServing}
+    <AppShell>
+      <CounterView
+        dashboard={dashboard}
+        liveStatus={liveStatus}
         busy={busy}
+        notice={notice}
+        errors={errors}
+        onCallNext={handleCallNext}
         onServe={(tokenId) => runAction(() => serveToken(tokenId))}
         onSkip={(tokenId) => runAction(() => skipToken(tokenId))}
+        onRecall={(tokenId) => runAction(() => recallToken(tokenId))}
+        onWalkIn={handleWalkIn}
+        onPause={() => runAction(() => pauseQueue(id))}
+        onOpen={() => runAction(() => openQueue(id))}
+        onClose={handleClose}
       />
-
-      <button type="button" className="call-next" disabled={busy || serving} onClick={handleCallNext}>
-        Call next
-      </button>
-
-      <div aria-live="polite">
-        {notice && <p className="notice">{notice}</p>}
-        {actionError && <p className="error" role="alert">{actionError}</p>}
-        {loadError && <p className="error" role="alert">{loadError}</p>}
-      </div>
-
-      <section className="panel">
-        <h2>Queue</h2>
-        <div className="actions">
-          <button type="button" className="secondary" disabled={busy || status !== 'Open'} onClick={handleWalkIn}>
-            Walk-in token
-          </button>
-          {status === 'Open' && (
-            <button type="button" className="secondary" disabled={busy} onClick={() => runAction(() => pauseQueue(id))}>
-              Pause
-            </button>
-          )}
-          {status !== 'Open' && (
-            <button type="button" className="secondary" disabled={busy} onClick={() => runAction(() => openQueue(id))}>
-              Open
-            </button>
-          )}
-          {status !== 'Closed' && (
-            <button type="button" className="secondary" disabled={busy} onClick={handleClose}>
-              Close for today
-            </button>
-          )}
-        </div>
-      </section>
-
-      <div className="lists">
-        <TokenList title="Waiting" tokens={dashboard.waiting} emptyText="No one is waiting." />
-        <TokenList
-          title="Skipped"
-          tokens={dashboard.skipped}
-          emptyText="No skipped tokens."
-          actionLabel="Recall"
-          busy={busy || serving}
-          onAction={(tokenId) => runAction(() => recallToken(tokenId))}
-        />
-      </div>
-    </main>
+    </AppShell>
   );
 }

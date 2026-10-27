@@ -1,0 +1,317 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 1200px;
+  padding: var(--space-6) var(--gutter) calc(var(--space-8) + 72px + env(safe-area-inset-bottom));
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.headMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.counterLabel {
+  color: var(--muted);
+}
+
+.title {
+  margin-top: var(--space-2);
+  font-size: clamp(2rem, 1.5rem + 2.2vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.stats div {
+  padding: var(--space-3) var(--space-3) 0 0;
+}
+
+.stats div + div {
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--line);
+}
+
+.stats dt {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.stats dd {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* The dark stage is the one thing staff look at all day. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 300px;
+  padding: clamp(1.25rem, 1rem + 1.6vw, 2rem);
+  color: var(--on-night);
+  background: var(--night);
+  border-radius: var(--radius-md);
+}
+
+.stageLabel {
+  color: var(--on-night-2);
+}
+
+.number {
+  margin-top: auto;
+  padding-top: var(--space-7);
+  font-size: clamp(5rem, 3rem + 8vw, 9rem);
+  font-weight: 650;
+  line-height: 0.85;
+  letter-spacing: -0.055em;
+}
+
+.empty {
+  color: var(--night-line);
+}
+
+.name {
+  margin-top: var(--space-4);
+  font-size: var(--text-lead);
+  color: var(--on-night-2);
+}
+
+.stageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.onNight {
+  color: var(--on-night);
+}
+
+@media (hover: hover) {
+  .onNight:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Phones: "Call next" sits in a bar at the bottom, where the thumb is. */
+.callBar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: rgba(244, 242, 238, 0.92);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+}
+
+/* While someone is being served, "Call next" reads as "not now", not as a broken button. */
+.callBar button:disabled {
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--line);
+  opacity: 1;
+}
+
+.side {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.column {
+  padding: var(--space-4) var(--space-5) var(--space-2);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+
+.columnTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.columnTitle span {
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.columnEmpty {
+  padding: var(--space-3) 0 var(--space-4);
+  color: var(--muted);
+  border-top: 1px solid var(--line-2);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 52px;
+  border-top: 1px solid var(--line-2);
+}
+
+.listNumber {
+  min-width: 4.4ch;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.listName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.messages:empty {
+  display: none;
+}
+
+.notice,
+.error {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.notice {
+  background: var(--signal-tint);
+}
+
+.error {
+  font-weight: 560;
+  color: var(--danger);
+  background: #fbe9e7;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+/* Tablet at the counter and up: stage left, lists right, the button inside the stage. */
+@media (min-width: 768px) {
+  .page {
+    grid-template-areas:
+      'head'
+      'controls'
+      'stats'
+      'grid'
+      'messages';
+    padding-bottom: var(--space-8);
+  }
+
+  .head {
+    grid-area: head;
+    justify-content: flex-start;
+  }
+
+  .stats {
+    grid-area: stats;
+  }
+
+  .grid {
+    grid-area: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .messages {
+    grid-area: messages;
+  }
+
+  .stage {
+    min-height: 480px;
+  }
+
+  .callBar button:disabled {
+    color: var(--on-night-2);
+    border-color: var(--night-line);
+  }
+
+  .callBar {
+    position: static;
+    width: 100%;
+    margin-top: var(--space-7);
+    padding: 0;
+    background: none;
+    border: 0;
+    backdrop-filter: none;
+  }
+
+  .controls {
+    grid-area: controls;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+@media (min-width: 960px) {
+  .page {
+    padding-top: var(--space-8);
+  }
+}
+
+/* Wide enough for the title and the queue buttons on one line. */
+@media (min-width: 1180px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head controls'
+      'stats stats'
+      'grid grid'
+      'messages messages';
+  }
+
+  .controls {
+    align-self: end;
+    justify-content: flex-end;
+  }
+}
