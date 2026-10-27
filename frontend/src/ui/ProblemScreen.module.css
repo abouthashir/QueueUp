@@ -1,0 +1,31 @@
+/* A broken link or a crash: calm, with one clear way out. */
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+  padding: var(--space-4) var(--gutter) var(--space-7);
+  background: var(--paper);
+}
+
+.body {
+  align-self: center;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.02;
+}
+
+.message {
+  margin-top: var(--space-4);
+  font-size: var(--text-lead);
+  color: var(--ink-2);
+}
+
+.action {
+  margin-top: var(--space-6);
+}

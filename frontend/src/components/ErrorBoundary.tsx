@@ -1,4 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Button } from '../ui/Button';
+import ProblemScreen from '../ui/ProblemScreen';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -22,13 +24,12 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   render() {
     if (this.state.failed) {
       return (
-        <main className="page">
-          <h1>Something went wrong</h1>
-          <p>This page hit a problem. Your token and your place in the queue are safe.</p>
-          <button type="button" onClick={() => window.location.reload()}>
-            Reload the page
-          </button>
-        </main>
+        <ProblemScreen
+          title="Something went wrong"
+          message="This page hit a problem. Your token and your place in the queue are safe."
+        >
+          <Button onClick={() => window.location.reload()}>Reload the page</Button>
+        </ProblemScreen>
       );
     }
 

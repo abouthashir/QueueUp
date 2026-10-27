@@ -1,4 +1,9 @@
 /* On screen: an A4 sheet on a grey desk. On paper: just the sheet. */
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
 .desk {
   min-height: 100dvh;
   padding: var(--space-5) var(--gutter) var(--space-8);
