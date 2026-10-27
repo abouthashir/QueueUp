@@ -1,0 +1,21 @@
+/* Shared by the log in and sign up forms. */
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.notice {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--signal-tint);
+  border-radius: var(--radius-sm);
+}
+
+.error {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-weight: 560;
+  color: var(--danger);
+  background: #fbe9e7;
+  border-radius: var(--radius-sm);
+}

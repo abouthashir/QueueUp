@@ -1,0 +1,95 @@
+/* Phones: logo, then the form. Laptops: the form on the left, a dark panel on the right. */
+.layout {
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+  padding: var(--space-4) var(--gutter) calc(var(--space-7) + env(safe-area-inset-bottom));
+}
+
+.home {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: var(--tap);
+  text-decoration: none;
+}
+
+.body {
+  align-self: center;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding-top: var(--space-6);
+}
+
+.title {
+  margin-bottom: var(--space-6);
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.02;
+}
+
+.footer {
+  margin-top: var(--space-6);
+  color: var(--muted);
+}
+
+.footer a {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.panel {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .panel {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--space-5);
+    height: 100dvh;
+    padding: var(--space-8) clamp(2rem, 5vw, 5rem);
+    color: var(--on-night);
+    background: var(--night);
+  }
+
+  .panel :global(.label) {
+    color: var(--on-night-2);
+  }
+
+  .statement {
+    max-width: 13ch;
+    font-size: var(--text-h2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-heading);
+    line-height: 1.02;
+  }
+
+  .facts {
+    display: grid;
+    max-width: 28rem;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facts li {
+    padding: var(--space-3) 0;
+    color: var(--on-night-2);
+    border-top: 1px solid var(--night-line);
+  }
+}

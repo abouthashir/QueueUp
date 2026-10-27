@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { login } from '../api';
+import AuthLayout from '../auth/AuthLayout';
 import { loadAuth, saveAuth } from '../authStorage';
+import { Button } from '../ui/Button';
+import TextField from '../ui/TextField';
+import styles from '../auth/AuthForm.module.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -31,41 +35,45 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="page">
-      <h1>Log in</h1>
-      {searchParams.has('expired') && <p className="notice">Your session has ended. Please log in again.</p>}
+    <AuthLayout
+      title="Log in"
+      footer={
+        <>
+          New to QueueUp? <Link to="/signup">Create an account</Link>
+        </>
+      }
+    >
+      {searchParams.has('expired') && <p className={styles.notice}>Your session has ended. Please log in again.</p>}
 
-      <form onSubmit={handleSubmit} className="form">
-        <label htmlFor="email">Email</label>
-        <input
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <TextField
           id="email"
+          label="Email"
           type="email"
           autoComplete="email"
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
-
-        <label htmlFor="password">Password</label>
-        <input
+        <TextField
           id="password"
+          label="Password"
           type="password"
           autoComplete="current-password"
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-
-        <button type="submit" disabled={busy}>
+        <Button type="submit" size="lg" block disabled={busy}>
           {busy ? 'Logging in…' : 'Log in'}
-        </button>
+        </Button>
       </form>
 
-      {error && <p className="error" role="alert">{error}</p>}
-
-      <p>
-        New to QueueUp? <Link to="/signup">Create an account</Link>
-      </p>
-    </main>
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </AuthLayout>
   );
 }

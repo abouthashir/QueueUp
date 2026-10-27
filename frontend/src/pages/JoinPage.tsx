@@ -1,16 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { getJoinInfo, getToken, joinQueue, type JoinInfo, type QueueStatus } from '../api';
+import { getJoinInfo, getToken, joinQueue, type JoinInfo } from '../api';
 import { forgetTokenId, loadTokenId, saveTokenId } from '../tokenStorage';
-import Badge, { type BadgeTone } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import Icon from '../ui/Icon';
 import Logo from '../ui/Logo';
+import QueueStatusBadge from '../ui/QueueStatusBadge';
 import StatusScreen from '../ui/StatusScreen';
 import TextField from '../ui/TextField';
 import styles from './JoinPage.module.css';
-
-const STATUS_TONE: Record<QueueStatus, BadgeTone> = { Open: 'live', Paused: 'paused', Closed: 'closed' };
 
 export default function JoinPage() {
   const { queueId } = useParams();
@@ -83,9 +81,7 @@ export default function JoinPage() {
     <div className={styles.screen}>
       <header className={styles.bar}>
         <Logo />
-        <Badge tone={STATUS_TONE[queue.status]} pulse={queue.status === 'Open'}>
-          {queue.status}
-        </Badge>
+        <QueueStatusBadge status={queue.status} />
       </header>
 
       <main className={styles.main}>

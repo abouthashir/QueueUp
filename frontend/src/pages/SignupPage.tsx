@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { signup, type SignupDetails } from '../api';
+import AuthLayout from '../auth/AuthLayout';
 import { saveAuth } from '../authStorage';
+import { Button } from '../ui/Button';
+import TextField from '../ui/TextField';
+import styles from '../auth/AuthForm.module.css';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -35,35 +39,36 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="page">
-      <h1>Create your QueueUp account</h1>
-
-      <form onSubmit={handleSubmit} className="form">
-        <label htmlFor="business-name">Business name</label>
-        <input
+    <AuthLayout
+      title="Create your account"
+      footer={
+        <>
+          Already have an account? <Link to="/login">Log in</Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <TextField
           id="business-name"
-          type="text"
+          label="Business name"
           autoComplete="organization"
           required
           maxLength={100}
           value={details.businessName}
           onChange={(event) => update('businessName', event.target.value)}
         />
-
-        <label htmlFor="name">Your name</label>
-        <input
+        <TextField
           id="name"
-          type="text"
+          label="Your name"
           autoComplete="name"
           required
           maxLength={100}
           value={details.name}
           onChange={(event) => update('name', event.target.value)}
         />
-
-        <label htmlFor="email">Email</label>
-        <input
+        <TextField
           id="email"
+          label="Email"
           type="email"
           autoComplete="email"
           required
@@ -71,10 +76,10 @@ export default function SignupPage() {
           value={details.email}
           onChange={(event) => update('email', event.target.value)}
         />
-
-        <label htmlFor="password">Password (at least 8 characters)</label>
-        <input
+        <TextField
           id="password"
+          label="Password"
+          hint="At least 8 characters."
           type="password"
           autoComplete="new-password"
           required
@@ -82,27 +87,25 @@ export default function SignupPage() {
           value={details.password}
           onChange={(event) => update('password', event.target.value)}
         />
-
-        <label htmlFor="counter-name">Your counter name</label>
-        <input
+        <TextField
           id="counter-name"
-          type="text"
+          label="Your counter name"
+          hint="Customers see it when you call them, for example Counter 1 or Room 2."
           required
           maxLength={50}
           value={details.counterName}
           onChange={(event) => update('counterName', event.target.value)}
         />
-
-        <button type="submit" disabled={busy}>
+        <Button type="submit" size="lg" block disabled={busy}>
           {busy ? 'Creating your account…' : 'Create account'}
-        </button>
+        </Button>
       </form>
 
-      {error && <p className="error" role="alert">{error}</p>}
-
-      <p>
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
-    </main>
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </AuthLayout>
   );
 }
