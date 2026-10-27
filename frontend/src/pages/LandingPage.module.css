@@ -1,3 +1,30 @@
+/* ---------- Shared type ---------- */
+.h2 {
+  margin-top: var(--space-4);
+  max-width: 15ch;
+  font-size: var(--text-h2);
+  font-weight: 600;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.02;
+}
+
+.body {
+  max-width: 30rem;
+  margin-top: var(--space-5);
+  font-size: 1.0625rem;
+  color: var(--ink-2);
+}
+
+.sideLabel {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-5);
+  color: var(--muted);
+}
+
+.index {
+  color: var(--muted);
+}
+
 /* Phones get one column; from 1024 px every block is placed on the 12-column grid. */
 .actions {
   display: flex;
@@ -77,16 +104,16 @@
   overflow: hidden;
 }
 
-.line>span {
+.line > span {
   display: block;
   animation: lineUp 1100ms var(--ease) both;
 }
 
-.line:nth-child(1)>span {
+.line:nth-child(1) > span {
   animation-delay: 140ms;
 }
 
-.line:nth-child(2)>span {
+.line:nth-child(2) > span {
   animation-delay: 260ms;
 }
 
@@ -244,5 +271,192 @@
     grid-row: 2;
     align-self: end;
     max-width: 40rem;
+  }
+}
+
+/* ---------- The idea ---------- */
+.idea {
+  padding-block: var(--section);
+}
+
+.ideaBody,
+.ideaList {
+  grid-column: 1 / -1;
+}
+
+.statement {
+  max-width: 24ch;
+  font-size: clamp(1.75rem, 1.15rem + 2.4vw, 3.125rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.statement span {
+  color: var(--muted);
+}
+
+.ideaList {
+  display: grid;
+  gap: var(--space-6) var(--column-gap);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ideaList li {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.ideaList h3 {
+  margin-top: var(--space-6);
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+}
+
+.ideaList p {
+  margin-top: var(--space-2);
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .ideaList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .sideLabel {
+    grid-column: 1 / span 3;
+    margin: 0;
+    padding-top: 0.9em;
+  }
+
+  .ideaBody,
+  .ideaList {
+    grid-column: 4 / -1;
+  }
+
+  .ideaBody {
+    grid-row: 1;
+  }
+}
+
+/* ---------- Customers: the token's three moments ---------- */
+.split {
+  row-gap: var(--space-8);
+  padding-bottom: var(--section);
+}
+
+.customersText {
+  grid-column: 1 / -1;
+}
+
+/* Phones: swipe through the three moments. Laptops: three steps going down, like a queue. */
+.journey {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--column-gap);
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0 var(--gutter);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.journey li {
+  flex: 0 0 74%;
+  scroll-snap-align: start;
+}
+
+.stage {
+  display: grid;
+  align-content: center;
+  min-height: 25rem;
+  padding: var(--space-4);
+  background: var(--paper-2);
+  border-radius: var(--radius-md);
+}
+
+.stageTurn {
+  background: var(--signal);
+}
+
+.journey .index {
+  display: block;
+  margin-top: var(--space-4);
+}
+
+.stepTitle {
+  margin-top: var(--space-2);
+  font-size: 1.0625rem;
+  letter-spacing: -0.015em;
+}
+
+.stepText {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.facts {
+  max-width: 30rem;
+  margin: var(--space-6) 0 0;
+}
+
+.facts div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: var(--space-4);
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.facts dt {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .journey li {
+    flex-basis: 42%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .split {
+    align-items: end;
+  }
+
+  .journey {
+    grid-column: 1 / span 7;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .journey li:nth-child(2) {
+    margin-top: var(--space-8);
+  }
+
+  .journey li:nth-child(3) {
+    margin-top: calc(2 * var(--space-8));
+  }
+
+  .customersText {
+    grid-column: 9 / -1;
+    padding-bottom: var(--space-4);
   }
 }
