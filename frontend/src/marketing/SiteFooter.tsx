@@ -38,4 +38,4 @@ export default function SiteFooter() {
       </p>
     </footer>
   );
-}
+} 
