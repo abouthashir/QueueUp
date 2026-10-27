@@ -1,0 +1,80 @@
+.footer {
+  padding-top: var(--section);
+  overflow: hidden;
+}
+
+.top {
+  row-gap: var(--space-7);
+}
+
+.brand {
+  grid-column: 1 / -1;
+}
+
+.brand p {
+  max-width: 20rem;
+  margin-top: var(--space-4);
+  color: var(--muted);
+}
+
+.column {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.column :global(.label) {
+  margin-bottom: var(--space-3);
+  color: var(--muted);
+}
+
+.column a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .column a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  /* A hairline that stops at the content edges, not the padding. */
+  background: linear-gradient(var(--line), var(--line)) center top / calc(100% - 2 * var(--gutter)) 1px no-repeat;
+}
+
+/* The name, set huge and cropped by the bottom edge. */
+.wordmark {
+  margin: var(--space-7) 0 -0.16em;
+  padding-left: var(--gutter);
+  font-size: clamp(5rem, 1rem + 19vw, 19rem);
+  font-weight: 650;
+  line-height: 0.74;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+  color: var(--paper-2);
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .brand {
+    grid-column: 1 / span 6;
+  }
+
+  .column {
+    grid-column: span 3;
+  }
+}

@@ -1,0 +1,130 @@
+/* Two floating pieces: the logo on the left, a compact nav pill on the right. */
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: calc(var(--frame) + 10px) calc(var(--frame) + 10px) 0;
+  pointer-events: none;
+}
+
+.home,
+.toggle,
+.menu {
+  pointer-events: auto;
+}
+
+.home,
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 14px;
+  background: var(--glass-light);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(14px) saturate(1.4);
+  text-decoration: none;
+}
+
+.toggle {
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 560;
+  color: var(--ink);
+  border: 0;
+  cursor: pointer;
+}
+
+/* Phones: the links open as a panel under the bar. */
+.menu {
+  display: none;
+  flex-basis: 100%;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+}
+
+.menu.open {
+  display: flex;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  font-size: 1.25rem;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.menu a.cta {
+  justify-content: center;
+  margin-top: var(--space-4);
+  font-size: var(--text-base);
+  color: var(--paper);
+  background: var(--ink);
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+@media (min-width: 960px) {
+  .toggle {
+    display: none;
+  }
+
+  .menu {
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    background: var(--glass-light);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+
+  .menu a {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    border: 0;
+    border-radius: 6px;
+  }
+
+  .menu a.cta {
+    margin: 0 0 0 4px;
+    padding: 0 14px;
+    font-size: var(--text-label);
+    border-radius: 6px;
+  }
+}
+
+/* Tablets in landscape get this bar too: keep finger-sized targets there. */
+@media (min-width: 960px) and (pointer: coarse) {
+  .menu a {
+    min-height: var(--tap);
+  }
+}
+
+@media (min-width: 960px) and (hover: hover) {
+  .menu a:not(.cta):hover {
+    background: rgba(19, 19, 17, 0.06);
+  }
+
+  .menu a.cta:hover {
+    background: var(--ink-2);
+  }
+}
