@@ -148,7 +148,7 @@ export default function LandingPage() {
 
         {/* ---------- The idea ---------- */}
         <section className={`container grid-12 ${styles.idea}`}>
-          <p className={`label ${styles.sideLabel}`}>The idea</p>
+          <h2 className={`label ${styles.sideLabel}`}>The idea</h2>
           <Reveal className={styles.ideaBody}>
             <p className={styles.statement}>
               Most of a queue is people standing around.{' '}
