@@ -1,0 +1,40 @@
+/* Loading and error screens for the customer and TV pages. */
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+  padding: var(--space-4) var(--gutter);
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.dark {
+  color: var(--on-night);
+  background: var(--night);
+}
+
+.message,
+.error {
+  align-self: center;
+  justify-self: center;
+  max-width: 30rem;
+  font-size: var(--text-lead);
+  text-align: center;
+}
+
+.message {
+  color: var(--muted);
+}
+
+.dark .message {
+  color: var(--on-night-2);
+}
+
+.error {
+  font-weight: 560;
+  color: var(--danger);
+}
+
+.dark .error {
+  color: #f4a99f;
+}

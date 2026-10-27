@@ -74,7 +74,7 @@ export default function TokenCard({ token, compact = false }: TokenCardProps) {
             )}
             <div>
               <dt>Now serving</dt>
-              <dd className="num">{token.nowServing.length > 0 ? token.nowServing.join(', ') : '—'}</dd>
+              <dd className="num">{token.nowServing.length > 0 ? token.nowServing.join(' · ') : '—'}</dd>
             </div>
           </dl>
         )}

@@ -1,0 +1,105 @@
+/* Phone first: header, the slip, then thumb-reach actions at the bottom. */
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  background: var(--paper);
+  transition: background-color 600ms var(--ease);
+}
+
+/* When it's their turn the whole screen becomes the token light. */
+.turn {
+  background: var(--signal);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--gutter);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--gutter);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.note svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.error {
+  padding: var(--space-3) var(--space-4);
+  font-weight: 560;
+  color: var(--danger);
+  background: #fbe9e7;
+  border-radius: var(--radius-sm);
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--gutter) calc(var(--space-4) + env(safe-area-inset-bottom));
+}
+
+/* Tablets and up: one centred column, buttons right under the slip. */
+@media (min-width: 640px) {
+  .screen {
+    grid-template-rows: auto auto auto;
+    align-content: start;
+  }
+
+  .main {
+    padding-block: clamp(2rem, 8vh, 5rem) var(--space-2);
+  }
+
+  .actions {
+    padding-bottom: var(--space-8);
+  }
+}
+
+/* Short landscape phones: slip and actions side by side, number sized by height. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .screen {
+    --slip-number: 19vh;
+
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+    grid-template-rows: auto 1fr;
+  }
+
+  .bar {
+    grid-column: 1 / -1;
+    padding-block: var(--space-2);
+  }
+
+  .main {
+    max-width: none;
+    padding-block: 0 var(--space-3);
+  }
+
+  .actions {
+    align-content: center;
+    padding-block: 0 var(--space-3);
+  }
+}

@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { alertCustomer, enableAlerts } from '../alerts';
 import { getToken, leaveQueue, type TokenInfo } from '../api';
-import ConnectionNotice from '../components/ConnectionNotice';
-import { describeToken, isNext } from '../tokenMessages';
+import TokenView from '../token/TokenView';
+import { isNext } from '../tokenMessages';
+import StatusScreen from '../ui/StatusScreen';
 import { useQueueUpdates } from '../useQueueUpdates';
 
 const REFRESH_EVERY_MS = 15_000;
@@ -90,46 +91,17 @@ export default function TokenPage() {
   }
 
   if (!token) {
-    return (
-      <main className="page">
-        {error ? <p className="error" role="alert">{error}</p> : <p className="muted">Loading…</p>}
-      </main>
-    );
+    return error ? <StatusScreen message={error} error /> : <StatusScreen message="Loading your token…" />;
   }
 
   return (
-    <main className="page">
-      <ConnectionNotice liveStatus={liveStatus} />
-      <p className="muted">{token.queueName}</p>
-      <p className="token-number" aria-label={`Your token number is ${token.displayNumber}`}>
-        {token.displayNumber}
-      </p>
-
-      <p className={`status status-${token.status.toLowerCase()}`} aria-live="polite">
-        {describeToken(token)}
-      </p>
-
-      {token.status === 'Waiting' && token.nowServing.length > 0 && (
-        <p className="muted">Now serving {token.nowServing.join(', ')}</p>
-      )}
-
-      {token.status === 'Waiting' && !alertsOn && (
-        <button type="button" onClick={handleEnableAlerts}>
-          Turn on alerts
-        </button>
-      )}
-
-      {token.status === 'Waiting' && alertsOn && (
-        <p className="muted">Alerts are on. Keep this page open and we'll beep when it's your turn.</p>
-      )}
-
-      {token.status === 'Waiting' && (
-        <button type="button" className="secondary" onClick={handleLeave}>
-          Leave queue
-        </button>
-      )}
-
-      {error && <p className="error" role="alert">{error}</p>}
-    </main>
+    <TokenView
+      token={token}
+      liveStatus={liveStatus}
+      alertsOn={alertsOn}
+      error={error}
+      onEnableAlerts={handleEnableAlerts}
+      onLeave={handleLeave}
+    />
   );
 }

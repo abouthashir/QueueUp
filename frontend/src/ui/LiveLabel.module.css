@@ -1,0 +1,23 @@
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.dot {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.on .dot {
+  background: var(--live);
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.3;
+  }
+}
