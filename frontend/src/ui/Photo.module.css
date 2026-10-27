@@ -1,0 +1,21 @@
+.frame {
+  overflow: hidden;
+  background: var(--paper-2);
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--photo-grade);
+  transition: transform 1600ms var(--ease);
+}
+
+/* Inside a Reveal, the photo starts slightly zoomed in and settles as it scrolls into view. */
+:global([data-reveal]) .frame img {
+  transform: scale(1.06);
+}
+
+:global([data-revealed]) .frame img {
+  transform: none;
+}

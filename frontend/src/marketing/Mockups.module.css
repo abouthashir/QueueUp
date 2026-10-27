@@ -95,6 +95,100 @@
   font-size: var(--text-lead);
 }
 
+/* ---------- Counter ---------- */
+.counter {
+  width: min(500px, 100%);
+  padding: 14px;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+}
+
+.counterHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.counterSub {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.counterBody {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  color: var(--on-night);
+  background: var(--night);
+  border-radius: var(--radius-sm);
+}
+
+.stage :global(.label) {
+  color: var(--on-night-2);
+}
+
+.stageNumber {
+  margin-top: 10px;
+  font-size: 2.75rem;
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.stageName {
+  margin-top: 4px;
+  font-size: var(--text-sm);
+  color: var(--on-night-2);
+}
+
+.callButton {
+  margin-top: 16px;
+  padding: 10px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+  background: var(--signal);
+  border-radius: 6px;
+}
+
+.queue {
+  margin: 0;
+  padding: 4px 12px;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+}
+
+.queue li {
+  padding: 9px 0;
+  border-top: 1px solid var(--line-2);
+}
+
+.queue li:first-child {
+  border-top: 0;
+}
+
+.queue :global(.num) {
+  margin-right: 8px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
 /* ---------- Phone ---------- */
 .phone {
   width: min(292px, 74vw);

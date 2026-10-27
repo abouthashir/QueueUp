@@ -28,7 +28,6 @@
 
   /* Photos share one grade so they read as a set. */
   --photo-grade: saturate(0.78) contrast(1.04);
-  --photo-shade: linear-gradient(180deg, rgba(14, 14, 13, 0) 40%, rgba(14, 14, 13, 0.55) 100%);
 
   /* Type: one editorial grotesk; numbers use its tabular figures. */
   --font: 'Schibsted Grotesk Variable', system-ui, 'Segoe UI', Roboto, sans-serif;

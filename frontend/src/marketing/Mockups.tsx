@@ -1,5 +1,6 @@
 import type { TokenInfo } from '../api';
 import TokenCard from '../token/TokenCard';
+import Badge from '../ui/Badge';
 import Icon from '../ui/Icon';
 import Logo from '../ui/Logo';
 import { SAMPLE_WAITING } from './samples';
@@ -36,6 +37,40 @@ export function BoardMockup({ large = false }: BoardMockupProps) {
           <span className="label">Next</span>
           <span className="num">A-040 · A-041 · A-042</span>
         </p>
+      </div>
+    </div>
+  );
+}
+
+export function CounterMockup() {
+  return (
+    <div className={styles.counter} role="img" aria-label="The counter screen, serving A-039, with a Call next button">
+      <div aria-hidden="true">
+        <div className={styles.counterHead}>
+          <span>
+            General OPD <span className={styles.counterSub}>· Counter 2</span>
+          </span>
+          <Badge tone="live">Open</Badge>
+        </div>
+        <div className={styles.counterBody}>
+          <div className={styles.stage}>
+            <span className="label">Now serving</span>
+            <span className={`${styles.stageNumber} num`}>A-039</span>
+            <span className={styles.stageName}>Anita S.</span>
+            <span className={styles.callButton}>Call next →</span>
+          </div>
+          <ol className={styles.queue}>
+            <li>
+              <span className="num">A-040</span> Priya
+            </li>
+            <li>
+              <span className="num">A-041</span> —
+            </li>
+            <li>
+              <span className="num">A-042</span> Ravi
+            </li>
+          </ol>
+        </div>
       </div>
     </div>
   );

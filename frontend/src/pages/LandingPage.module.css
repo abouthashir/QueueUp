@@ -460,3 +460,140 @@
     padding-bottom: var(--space-4);
   }
 }
+
+/* ---------- Staff: text left, photo right with the counter hanging off it ---------- */
+.staffText,
+.staffMedia {
+  grid-column: 1 / -1;
+}
+
+.staffMedia {
+  position: relative;
+  margin-bottom: var(--space-8);
+}
+
+.widePhoto {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+}
+
+.floatCounter {
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(-1 * var(--space-8));
+}
+
+@media (min-width: 1024px) {
+  .staffText {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    padding-bottom: var(--space-4);
+  }
+
+  .staffMedia {
+    grid-column: 6 / -1;
+    grid-row: 1;
+    margin-bottom: 0;
+  }
+
+  .widePhoto {
+    aspect-ratio: 6 / 5;
+  }
+
+  .floatCounter {
+    right: auto;
+    left: -12%;
+    bottom: 9%;
+    width: min(460px, 70%);
+  }
+}
+
+/* ---------- Places: three photos, three proportions ---------- */
+.places {
+  padding-block: var(--section);
+}
+
+.placesTitle {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-8);
+}
+
+/* Phones: a row you swipe through, one card at a time. */
+.placeRow {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--column-gap);
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.place {
+  flex: 0 0 78%;
+  scroll-snap-align: start;
+}
+
+.placePhoto {
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md);
+}
+
+.place h3 {
+  margin-top: var(--space-4);
+  font-size: var(--text-h3);
+}
+
+.place p {
+  max-width: 24rem;
+  margin-top: var(--space-1);
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .place {
+    flex-basis: 44%;
+  }
+}
+
+/* Laptops: the same three cards on the 12-column grid, with three proportions. */
+@media (min-width: 1024px) {
+  .placesTitle {
+    grid-column: 4 / -1;
+    grid-row: 1;
+  }
+
+  .placeRow {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--column-gap);
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .place:nth-child(1) {
+    grid-column: 1 / span 5;
+  }
+
+  .place:nth-child(2) {
+    grid-column: 6 / span 4;
+    margin-top: 22%;
+  }
+
+  .place:nth-child(2) .placePhoto {
+    aspect-ratio: 3 / 4;
+  }
+
+  .place:nth-child(3) {
+    grid-column: 10 / span 3;
+    margin-top: 44%;
+  }
+
+  .place:nth-child(3) .placePhoto {
+    aspect-ratio: 2 / 3;
+  }
+}

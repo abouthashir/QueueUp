@@ -1,5 +1,5 @@
 import { loadAuth } from '../authStorage';
-import { AlertToast, BoardMockup, PhoneMockup } from '../marketing/Mockups';
+import { AlertToast, BoardMockup, CounterMockup, PhoneMockup } from '../marketing/Mockups';
 import { SAMPLE_WAITING } from '../marketing/samples';
 import SiteFooter from '../marketing/SiteFooter';
 import SiteHeader from '../marketing/SiteHeader';
@@ -8,6 +8,7 @@ import { ButtonAnchor, ButtonLink } from '../ui/Button';
 import Icon, { type IconName } from '../ui/Icon';
 import Reveal from '../ui/Reveal';
 import styles from './LandingPage.module.css';
+import Photo from '../ui/Photo';
 
 const HERO_POINTS: { icon: IconName; text: string }[] = [
   { icon: 'phone', text: 'No app to install' },
@@ -43,6 +44,18 @@ const CUSTOMER_FACTS = [
   { term: 'Updates', text: 'Within about two seconds of every call' },
   { term: 'Name', text: 'Optional. No phone number, no password' },
   { term: 'Alerts', text: "A chime and a notification when they're next" },
+];
+
+const STAFF_FACTS = [
+  { term: 'Many counters', text: 'Pressing Call next together still calls two different people' },
+  { term: 'Walk-ins', text: 'Issue a token at the desk for anyone without a phone' },
+  { term: 'Skip & recall', text: 'Missed their turn? Call them back when your counter is free' },
+];
+
+const PLACES = [
+  { photo: 'clinic', alt: 'A bright clinic corridor with waiting benches', title: 'Clinics', text: 'Patients wait outside or nearby instead of filling the corridor.' },
+  { photo: 'bank', alt: 'A marble reception counter in a bank lobby', title: 'Banks', text: 'Several counters call from one shared queue, strictly in order.' },
+  { photo: 'salon', alt: 'Three salon chairs facing round mirrors', title: 'Salons', text: 'Walk-ins get an honest wait time and can step out for a while.' },
 ];
 
 export default function LandingPage() {
@@ -167,6 +180,56 @@ export default function LandingPage() {
               ))}
             </dl>
           </Reveal>
+        </section>
+
+        {/* ---------- Staff ---------- */}
+        <section id="staff" className={`container grid-12 ${styles.split}`}>
+          <Reveal className={styles.staffText}>
+            <p className="label">For staff</p>
+            <h2 className={styles.h2}>One button runs the queue.</h2>
+            <p className={styles.body}>
+              Call next brings the next person to your counter and updates every phone and the TV board at the same
+              moment.
+            </p>
+            <dl className={styles.facts}>
+              {STAFF_FACTS.map((fact) => (
+                <div key={fact.term}>
+                  <dt>{fact.term}</dt>
+                  <dd>{fact.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </Reveal>
+
+          <div className={styles.staffMedia}>
+            <Photo
+              name="staff-desk"
+              alt="A wooden reception desk in a bright room"
+              sizes="(min-width: 960px) 55vw, 100vw"
+              className={styles.widePhoto}
+            />
+            <Reveal delay={150} className={styles.floatCounter}>
+              <CounterMockup />
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ---------- Places ---------- */}
+        <section className={`container grid-12 ${styles.places}`}>
+          <p className={`label ${styles.sideLabel}`}>Made for</p>
+          <Reveal className={styles.placesTitle}>
+            <h2 className={styles.h2}>Places where people wait their turn.</h2>
+          </Reveal>
+
+          <div className={styles.placeRow}>
+            {PLACES.map((place, index) => (
+              <Reveal key={place.title} delay={index * 90} className={styles.place}>
+                <Photo name={place.photo} alt={place.alt} sizes="(min-width: 960px) 33vw, 80vw" className={styles.placePhoto} />
+                <h3>{place.title}</h3>
+                <p>{place.text}</p>
+              </Reveal>
+            ))}
+          </div>
         </section>
       </main>
 
