@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { playChime, unlockSound } from '../alerts';
 import { getDisplay, type DisplayInfo } from '../api';
-import ConnectionNotice from '../components/ConnectionNotice';
+import { Button } from '../ui/Button';
+import LiveLabel from '../ui/LiveLabel';
+import StatusScreen from '../ui/StatusScreen';
 import { useQueueUpdates } from '../useQueueUpdates';
+import styles from './DisplayPage.module.css';
 
 const REFRESH_EVERY_MS = 15_000;
 
@@ -76,51 +79,70 @@ export default function DisplayPage() {
   }
 
   if (!info) {
-    return (
-      <main className="display">
-        {error ? <p role="alert">{error}</p> : <p>Loading…</p>}
-      </main>
-    );
+    return error ? <StatusScreen message={error} error dark /> : <StatusScreen message="Loading…" dark />;
   }
 
   return (
-    <main className="display">
-      <ConnectionNotice liveStatus={liveStatus} />
-      <header className="display-header">
-        <p>{info.businessName}</p>
-        <h1>{info.queueName}</h1>
+    <main className={styles.screen}>
+      <header className={styles.bar}>
+        <div>
+          <p className={styles.business}>{info.businessName}</p>
+          <h1 className={styles.title}>{info.queueName}</h1>
+        </div>
+        <LiveLabel status={liveStatus} />
       </header>
 
-      {info.status !== 'Open' && (
-        <p className="display-status">{info.status === 'Paused' ? 'Paused. Back soon.' : 'Closed for today.'}</p>
-      )}
+      <div className={styles.board}>
+        <section aria-labelledby="serving-label" aria-live="polite">
+          {info.status !== 'Open' && (
+            <p className={styles.status}>{info.status === 'Paused' ? 'Paused. Back soon.' : 'Closed for today.'}</p>
+          )}
+          <h2 id="serving-label" className={`label ${styles.sectionLabel}`}>
+            Now serving
+          </h2>
+          {info.nowServing.length === 0 ? (
+            <p className={styles.empty}>Please wait for your number.</p>
+          ) : (
+            <ul className={styles.serving}>
+              {info.nowServing.map((serving) => (
+                <li key={serving.counterName}>
+                  <span className={`num ${styles.number}`}>{serving.displayNumber}</span>
+                  <span className={styles.counter}>{serving.counterName}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      <section aria-label="Now serving" aria-live="polite">
-        <h2>Now serving</h2>
-        {info.nowServing.length === 0 ? (
-          <p className="display-empty">Please wait for your number.</p>
-        ) : (
-          <ul className="display-serving">
-            {info.nowServing.map((serving) => (
-              <li key={serving.counterName}>
-                <span className="display-number">{serving.displayNumber}</span>
-                <span className="display-counter">{serving.counterName}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section aria-label="Next">
-        <h2>Next</h2>
-        <p className="display-next">{info.next.length > 0 ? info.next.join('   ') : 'No one waiting'}</p>
-        <p>{info.peopleWaiting} waiting</p>
-      </section>
+        <section aria-labelledby="next-label">
+          <h2 id="next-label" className={`label ${styles.sectionLabel}`}>
+            Next
+          </h2>
+          {info.next.length > 0 ? (
+            <ol className={styles.next}>
+              {info.next.map((number) => (
+                <li key={number} className="num">
+                  {number}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className={styles.empty}>No one waiting</p>
+          )}
+          <p className={styles.waiting}>{info.peopleWaiting} waiting</p>
+        </section>
+      </div>
 
       {!started && (
-        <button type="button" className="display-start" onClick={handleStart}>
-          Start display
-        </button>
+        <div className={styles.start}>
+          <div className={styles.startPanel}>
+            <h2>Ready for the waiting room?</h2>
+            <p>Starting the display turns on the chime for new calls and fills the screen.</p>
+            <Button variant="light" size="lg" onClick={handleStart}>
+              Start display
+            </Button>
+          </div>
+        </div>
       )}
     </main>
   );

@@ -1,0 +1,135 @@
+/* The waiting-room TV: sized from the screen itself (vw/vh) so it reads from across the room. */
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 5vh;
+  min-height: 100dvh;
+  padding: 4vh 4vw;
+  font-size: clamp(1rem, 0.5rem + 1.1vw, 2rem);
+  color: var(--on-night);
+  background: var(--night);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  color: var(--on-night-2);
+}
+
+.business {
+  font-size: 0.8em;
+}
+
+.title {
+  margin-top: 0.15em;
+  font-size: 2em;
+  color: var(--on-night);
+}
+
+.board {
+  display: grid;
+  align-content: start;
+  gap: 5vh 4vw;
+}
+
+.sectionLabel {
+  font-size: 0.75em;
+  color: var(--on-night-2);
+}
+
+.status {
+  margin-bottom: 0.6em;
+  font-size: 1.4em;
+  font-weight: 600;
+  color: var(--signal);
+}
+
+.serving {
+  margin: 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.serving li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 1em;
+  padding: 2.5vh 0;
+  border-top: 1px solid var(--night-line);
+}
+
+.number {
+  font-size: clamp(4rem, 2rem + 9vw, 15rem);
+  font-weight: 650;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--signal);
+}
+
+.counter {
+  font-size: 1.5em;
+  color: var(--on-night-2);
+}
+
+.empty {
+  margin-top: 0.8em;
+  font-size: 1.6em;
+  color: var(--on-night-2);
+}
+
+.next {
+  margin: 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.next li {
+  padding: 1.2vh 0;
+  font-size: 2.6em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  border-top: 1px solid var(--night-line);
+}
+
+.waiting {
+  margin-top: 1em;
+  color: var(--on-night-2);
+}
+
+/* Browsers only allow sound after a click, so the board starts with one. */
+.start {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: rgba(14, 14, 13, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.startPanel {
+  max-width: 34rem;
+  text-align: center;
+}
+
+.startPanel h2 {
+  font-size: var(--text-h2);
+}
+
+.startPanel p {
+  margin: var(--space-4) 0 var(--space-6);
+  font-size: var(--text-lead);
+  color: var(--on-night-2);
+}
+
+@media (min-width: 900px) and (orientation: landscape) {
+  .board {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
