@@ -1,0 +1,248 @@
+/* Phones get one column; from 1024 px every block is placed on the 12-column grid. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--space-6);
+}
+
+/* Framed sections line their content up with the page container. */
+.hero {
+  --inline: max(var(--gutter), calc((100% - var(--container)) / 2));
+}
+
+/* ---------- Hero: statement on the left, the product layered on the right ---------- */
+.heroFrame {
+  padding: var(--frame);
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  row-gap: var(--space-8);
+  min-height: min(calc(100svh - 2 * var(--frame)), 62rem);
+  padding: calc(88px + var(--space-7)) var(--inline) var(--space-6);
+  background:
+    radial-gradient(55% 65% at 80% 42%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+    var(--paper-2);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* The 12 columns, drawn as faint lanes: a quiet nod to queues and to the grid. */
+.hero .guides {
+  position: absolute;
+  inset: 0 var(--inline);
+  z-index: -1;
+  display: none;
+}
+
+.guides span {
+  border-left: 1px solid rgba(19, 19, 17, 0.05);
+}
+
+.guides span:last-child {
+  border-right: 1px solid rgba(19, 19, 17, 0.05);
+}
+
+.heroContent {
+  max-width: 46rem;
+}
+
+.heroChip {
+  display: inline-block;
+  padding: 7px 10px;
+  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  animation: fade 900ms var(--ease) 80ms both;
+}
+
+.heroTitle {
+  margin-top: var(--space-6);
+  font-size: clamp(2.5rem, 1rem + 4.4vw, 4.75rem);
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+/* Each line slides up out of its own mask. */
+.line {
+  display: block;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+  overflow: hidden;
+}
+
+.line>span {
+  display: block;
+  animation: lineUp 1100ms var(--ease) both;
+}
+
+.line:nth-child(1)>span {
+  animation-delay: 140ms;
+}
+
+.line:nth-child(2)>span {
+  animation-delay: 260ms;
+}
+
+.lineMuted {
+  color: #7b7c77;
+}
+
+.heroLead {
+  max-width: 34rem;
+  margin-top: var(--space-6);
+  font-size: var(--text-lead);
+  color: var(--ink-2);
+  animation: fade 900ms var(--ease) 480ms both;
+}
+
+.heroContent .actions {
+  animation: fade 900ms var(--ease) 600ms both;
+}
+
+.heroVisual {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding-bottom: var(--space-6);
+}
+
+.heroPhone {
+  position: relative;
+  z-index: 1;
+  animation: rise 1200ms var(--ease) 300ms both;
+}
+
+/* On phones the phone and board already tell the story; the toast joins from 640 px. */
+.heroToast {
+  position: absolute;
+  top: 9%;
+  left: 0;
+  z-index: 3;
+  display: none;
+  animation: drop 900ms var(--ease) 1300ms both;
+}
+
+.heroBoard {
+  position: relative;
+  z-index: 2;
+  width: min(340px, 86vw);
+  justify-self: start;
+  margin-top: -120px;
+  animation: rise 1200ms var(--ease) 520ms both;
+}
+
+.heroPoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+  padding: var(--space-4) 0 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  font-weight: 540;
+  color: var(--ink-2);
+  border-top: 1px solid var(--line);
+}
+
+.heroPoints li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@keyframes lineUp {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+}
+
+@media (min-width: 640px) {
+  .heroVisual {
+    justify-items: end;
+    min-height: 640px;
+    padding: 0 6% 0 0;
+  }
+
+  .heroBoard {
+    position: absolute;
+    left: 0;
+    bottom: 8%;
+    margin: 0;
+  }
+
+  .heroToast {
+    display: block;
+    left: 4%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: 1fr auto;
+    column-gap: var(--column-gap);
+    padding-top: calc(96px + var(--space-6));
+  }
+
+  .hero .guides {
+    display: grid;
+  }
+
+  .heroContent {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .heroVisual {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    padding-right: 0;
+  }
+
+  .heroBoard {
+    left: -22%;
+    bottom: 9%;
+  }
+
+  .heroToast {
+    left: -10%;
+    top: 14%;
+  }
+
+  .heroPoints {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    max-width: 40rem;
+  }
+}
