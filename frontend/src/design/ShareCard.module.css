@@ -1,0 +1,41 @@
+/* The size LinkedIn recommends for a link preview: 1200 × 627 pixels. */
+.card {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  align-items: center;
+  gap: 72px;
+  width: 1200px;
+  height: 627px;
+  padding: 0 88px;
+  background:
+    radial-gradient(45% 75% at 80% 50%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+    var(--paper-2);
+  overflow: hidden;
+}
+
+/* The logo is drawn for a 17 px header; zoom makes the whole thing bigger, mark included. */
+.brand {
+  zoom: 1.6;
+}
+
+.title {
+  margin-top: 44px;
+  font-size: 68px;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.muted {
+  display: block;
+  color: #7b7c77;
+}
+
+.lead {
+  max-width: 30rem;
+  margin-top: 32px;
+  font-size: 24px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
